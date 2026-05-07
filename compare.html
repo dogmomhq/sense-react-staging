@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Design Compare — Landing</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #1a1a1a;
+    color: #fff;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* === Toggle bar === */
+  .toggle-bar {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    padding: 8px 16px;
+    background: #111;
+    position: relative;
+    z-index: 10;
+  }
+  .toggle-btn {
+    flex: 1;
+    max-width: 160px;
+    padding: 10px 0;
+    border: none;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: all 0.2s;
+    background: #333;
+    color: #888;
+  }
+  .toggle-btn:first-child { border-radius: 8px 0 0 8px; }
+  .toggle-btn:last-child { border-radius: 0 8px 8px 0; }
+  .toggle-btn.active {
+    background: #7B8DB8;
+    color: #fff;
+  }
+  .toggle-btn.active-target {
+    background: #E85D4A;
+    color: #fff;
+  }
+
+  /* === Panels === */
+  .compare-container {
+    display: flex;
+    height: calc(100vh - 50px);
+    position: relative;
+  }
+
+  /* Desktop: side by side */
+  .panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+  }
+  .panel-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 8px 0 4px;
+    color: #888;
+  }
+  .panel-label.target { color: #E85D4A; }
+  .panel-label.build { color: #7B8DB8; }
+
+  .panel-frame {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .panel-frame img {
+    width: 100%;
+    max-width: 390px;
+    height: auto;
+    display: block;
+  }
+  .panel-frame iframe {
+    width: 390px;
+    height: 100%;
+    border: none;
+    background: #E8E4DF;
+  }
+
+  .divider {
+    width: 2px;
+    background: #333;
+    flex-shrink: 0;
+  }
+
+  /* Mobile: toggle between panels */
+  @media (max-width: 800px) {
+    .toggle-bar { display: flex; }
+    .divider { display: none; }
+    .compare-container { display: block; height: calc(100vh - 50px); }
+    .panel {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      transition: opacity 0.2s;
+    }
+    .panel.hidden { opacity: 0; pointer-events: none; }
+    .panel-frame { height: 100%; }
+    .panel-frame iframe { width: 100%; max-width: 430px; }
+    .panel-frame img { max-width: 430px; }
+  }
+
+  /* Desktop: always show both */
+  @media (min-width: 801px) {
+    .toggle-bar { display: none; }
+    .panel { display: flex !important; }
+    .panel.hidden { opacity: 1; pointer-events: all; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Mobile toggle -->
+<div class="toggle-bar">
+  <button class="toggle-btn active-target" id="btnTarget" onclick="showPanel('target')">TARGET</button>
+  <button class="toggle-btn active" id="btnBuild" onclick="showPanel('build')">BUILD</button>
+</div>
+
+<div class="compare-container">
+  <!-- Target panel -->
+  <div class="panel" id="panelTarget">
+    <div class="panel-label target">TARGET</div>
+    <div class="panel-frame">
+      <img src="design-target.jpg" alt="Design Target">
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Build panel -->
+  <div class="panel hidden" id="panelBuild">
+    <div class="panel-label build">BUILD</div>
+    <div class="panel-frame">
+      <iframe src="mockup.html"></iframe>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Default to TARGET on mobile
+  let activePanel = 'target';
+
+  function showPanel(which) {
+    activePanel = which;
+    const target = document.getElementById('panelTarget');
+    const build = document.getElementById('panelBuild');
+    const btnTarget = document.getElementById('btnTarget');
+    const btnBuild = document.getElementById('btnBuild');
+
+    if (which === 'target') {
+      target.classList.remove('hidden');
+      build.classList.add('hidden');
+      btnTarget.classList.add('active-target');
+      btnBuild.classList.remove('active');
+    } else {
+      build.classList.remove('hidden');
+      target.classList.add('hidden');
+      btnTarget.classList.remove('active-target');
+      btnBuild.classList.add('active');
+    }
+  }
+
+  // Swipe to toggle on mobile
+  let startX = 0;
+  document.addEventListener('touchstart', e => { startX = e.touches[0].clientX; });
+  document.addEventListener('touchend', e => {
+    const diff = e.changedTouches[0].clientX - startX;
+    if (Math.abs(diff) > 60) {
+      showPanel(diff > 0 ? 'target' : 'build');
+    }
+  });
+</script>
+</body>
+</html>
