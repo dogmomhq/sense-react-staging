@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>COMMON SENSE — Landing</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  :root {
+    --bg: #E8E4DF;
+    --bg-card: #FFFFFF;
+    --accent: #7B8DB8;
+    --accent-light: #9AADCF;
+    --text-primary: #1A1A2E;
+    --text-secondary: #6B7B94;
+    --border: #C8CFD8;
+    --nav-bg: #FFFFFF;
+  }
+
+  html, body {
+    height: 100%;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .app {
+    max-width: 430px;
+    margin: 0 auto;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    background: var(--bg);
+  }
+
+  /* === Background pattern === */
+  .bg-pattern {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .bg-pattern::before {
+    content: '';
+    position: absolute;
+    top: 30%;
+    left: -20%;
+    width: 140%;
+    height: 140%;
+    background:
+      linear-gradient(135deg, transparent 40%, rgba(123,141,184,0.06) 40%, rgba(123,141,184,0.06) 42%, transparent 42%),
+      linear-gradient(225deg, transparent 40%, rgba(123,141,184,0.06) 40%, rgba(123,141,184,0.06) 42%, transparent 42%),
+      linear-gradient(135deg, transparent 55%, rgba(123,141,184,0.04) 55%, rgba(123,141,184,0.04) 57%, transparent 57%),
+      linear-gradient(225deg, transparent 55%, rgba(123,141,184,0.04) 55%, rgba(123,141,184,0.04) 57%, transparent 57%);
+  }
+
+  /* === Top bar === */
+  .top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    z-index: 2;
+    position: relative;
+  }
+  .username {
+    font-weight: 800;
+    font-size: 18px;
+    color: var(--text-primary);
+    letter-spacing: -0.3px;
+  }
+  .balance-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .balance {
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--text-primary);
+  }
+  .add-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: none;
+    border: 2.5px solid var(--accent);
+    color: var(--accent);
+    font-size: 20px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    line-height: 1;
+    padding-bottom: 1px;
+  }
+
+  /* === Hero banner === */
+  .hero-banner {
+    position: relative;
+    width: 100%;
+    height: 220px;
+    overflow: hidden;
+    z-index: 1;
+  }
+  .hero-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 30%;
+    filter: brightness(0.55) contrast(1.1);
+  }
+  .hero-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: 0;
+    background: linear-gradient(180deg, rgba(20,20,40,0.2) 0%, rgba(20,20,40,0.4) 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 28px;
+  }
+  .hero-title-common {
+    font-size: 64px;
+    font-weight: 900;
+    color: #FFFFFF;
+    line-height: 0.95;
+    letter-spacing: -1px;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+  }
+  .hero-title-sense {
+    font-size: 64px;
+    font-weight: 900;
+    color: var(--accent-light);
+    line-height: 0.95;
+    letter-spacing: -1px;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.4);
+  }
+
+  /* === Main content === */
+  .main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 32px;
+    gap: 24px;
+    z-index: 1;
+    position: relative;
+    margin-top: -10px;
+  }
+
+  /* === Wager stepper === */
+  .wager-stepper {
+    display: flex;
+    align-items: center;
+    background: var(--bg-card);
+    border-radius: 16px;
+    padding: 6px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04);
+    width: 260px;
+    justify-content: space-between;
+  }
+  .stepper-btn {
+    width: 52px;
+    height: 48px;
+    border-radius: 12px;
+    background: var(--accent);
+    border: none;
+    color: white;
+    font-size: 26px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+    line-height: 1;
+  }
+  .stepper-btn:active {
+    background: #6A7CA7;
+  }
+  .wager-amount {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.5px;
+  }
+
+  /* === Play button === */
+  .play-now-btn {
+    width: 100%;
+    max-width: 300px;
+    padding: 20px 0;
+    background: #111111;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 50px;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: transform 0.1s;
+  }
+  .play-now-btn:active {
+    transform: scale(0.97);
+  }
+
+  /* === Practice button === */
+  .practice-btn {
+    width: 100%;
+    max-width: 240px;
+    padding: 14px 0;
+    background: transparent;
+    color: var(--accent);
+    border: 2px solid var(--border);
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+  }
+
+  /* === Bottom nav === */
+  .bottom-nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 10px 0 20px;
+    background: var(--nav-bg);
+    border-top: 1px solid rgba(0,0,0,0.06);
+    z-index: 2;
+    position: relative;
+  }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    flex: 1;
+    color: var(--text-secondary);
+    transition: color 0.15s;
+  }
+  .nav-item.active {
+    color: var(--accent);
+  }
+  .nav-icon {
+    width: 24px;
+    height: 24px;
+  }
+  .nav-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+  }
+
+  /* Safe area for notched phones */
+  @supports (padding-top: env(safe-area-inset-top)) {
+    .top-bar { padding-top: calc(env(safe-area-inset-top) + 8px); }
+    .bottom-nav { padding-bottom: calc(env(safe-area-inset-bottom) + 8px); }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="bg-pattern"></div>
+
+  <!-- Top bar -->
+  <div class="top-bar">
+    <div class="username">FastLynx69</div>
+    <div class="balance-row">
+      <div class="balance">$11.36</div>
+      <button class="add-btn">+</button>
+    </div>
+  </div>
+
+  <!-- Hero banner -->
+  <div class="hero-banner">
+    <img class="hero-img" src="https://images.unsplash.com/photo-1614027164847-1b28cfe1df60?w=800&q=80" alt="Lion" crossorigin="anonymous">
+    <div class="hero-overlay">
+      <div class="hero-title-common">COMMON</div>
+      <div class="hero-title-sense">SENSE</div>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div class="main-content">
+    <!-- Wager stepper -->
+    <div class="wager-stepper">
+      <button class="stepper-btn" id="stepDown">−</button>
+      <div class="wager-amount" id="wagerDisplay">$1</div>
+      <button class="stepper-btn" id="stepUp">+</button>
+    </div>
+
+    <!-- Play Now -->
+    <button class="play-now-btn">PLAY NOW</button>
+
+    <!-- Practice Mode -->
+    <button class="practice-btn">Practice Mode</button>
+  </div>
+
+  <!-- Bottom nav -->
+  <div class="bottom-nav">
+    <div class="nav-item active">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="5 3 19 12 5 21 5 3"/>
+      </svg>
+      <span class="nav-label">Play</span>
+    </div>
+    <div class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="7" width="7" height="13" rx="1"/><rect x="15" y="3" width="7" height="17" rx="1"/><path d="M9 14h6"/><path d="M9 10h6"/>
+      </svg>
+      <span class="nav-label">Challenge</span>
+    </div>
+    <div class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+      </svg>
+      <span class="nav-label">Profile</span>
+    </div>
+    <div class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+      <span class="nav-label">Hosts</span>
+    </div>
+    <div class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+      </svg>
+      <span class="nav-label">History</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  const tiers = ['$0.10', '$1', '$10', '$100'];
+  let tierIdx = 1;
+  const display = document.getElementById('wagerDisplay');
+  document.getElementById('stepDown').addEventListener('click', () => {
+    tierIdx = Math.max(0, tierIdx - 1);
+    display.textContent = tiers[tierIdx];
+  });
+  document.getElementById('stepUp').addEventListener('click', () => {
+    tierIdx = Math.min(tiers.length - 1, tierIdx + 1);
+    display.textContent = tiers[tierIdx];
+  });
+</script>
+</body>
+</html>
