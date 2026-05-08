@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Leaderboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root { --text-primary: #1A1A2E; --text-secondary: #6B7B94; --accent: #6C63FF; --win: #22C55E; --lose: #EF4444; }
+  html, body { height: 100%; font-family: 'Inter', -apple-system, sans-serif; color: var(--text-primary); overflow: hidden; -webkit-font-smoothing: antialiased; }
+  .app { max-width: 430px; margin: 0 auto; height: 100%; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+  .bg-image { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 0; }
+  .bg-image img { width: 100%; height: 100%; object-fit: cover; }
+
+  .page-header {
+    padding: 16px 20px 12px;
+    z-index: 1;
+    position: relative;
+  }
+  .page-title {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: -0.3px;
+  }
+  .time-range {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-top: 2px;
+  }
+
+  .leaderboard-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 16px 16px;
+    z-index: 1;
+    position: relative;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .lb-row {
+    display: flex;
+    align-items: center;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(8px);
+    border-radius: 14px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+  }
+  .lb-row.you {
+    background: rgba(108,99,255,0.08);
+    border: 2px solid rgba(108,99,255,0.2);
+  }
+  .lb-rank {
+    width: 28px;
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--text-secondary);
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .lb-rank.gold { color: #F59E0B; }
+  .lb-rank.silver { color: #94A3B8; }
+  .lb-rank.bronze { color: #CD7F32; }
+  .lb-info {
+    flex: 1;
+    margin-left: 12px;
+  }
+  .lb-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  .lb-record {
+    font-size: 11px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin-top: 1px;
+  }
+  .lb-stats {
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .lb-winrate {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--win);
+  }
+  .lb-games {
+    font-size: 11px;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  .bottom-nav { display: flex; justify-content: space-around; align-items: center; padding: 10px 0 18px; background: #FFF; border-top: 1px solid rgba(0,0,0,0.06); z-index: 2; position: relative; flex-shrink: 0; }
+  .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; color: #2A2A2A; }
+  .nav-item.active { color: var(--accent); }
+  .nav-icon { width: 24px; height: 24px; }
+  .nav-label { font-size: 10px; font-weight: 700; }
+  @supports (padding-top: env(safe-area-inset-top)) { .page-header { padding-top: calc(env(safe-area-inset-top) + 10px); } .bottom-nav { padding-bottom: calc(env(safe-area-inset-bottom) + 8px); } }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="bg-image"><img src="assets/background.jpg" alt=""></div>
+
+  <div class="page-header">
+    <div class="page-title">Leaderboard</div>
+    <div class="time-range">Last 7 days</div>
+  </div>
+
+  <div class="leaderboard-list">
+    <div class="lb-row">
+      <div class="lb-rank gold">1</div>
+      <div class="lb-info"><div class="lb-name">QuickPanda88</div><div class="lb-record">42W - 8L - 3D</div></div>
+      <div class="lb-stats"><div class="lb-winrate">79%</div><div class="lb-games">53 games</div></div>
+    </div>
+    <div class="lb-row">
+      <div class="lb-rank silver">2</div>
+      <div class="lb-info"><div class="lb-name">SharpOwl42</div><div class="lb-record">38W - 12L - 5D</div></div>
+      <div class="lb-stats"><div class="lb-winrate">69%</div><div class="lb-games">55 games</div></div>
+    </div>
+    <div class="lb-row">
+      <div class="lb-rank bronze">3</div>
+      <div class="lb-info"><div class="lb-name">SwiftEagle77</div><div class="lb-record">31W - 10L - 4D</div></div>
+      <div class="lb-stats"><div class="lb-winrate">69%</div><div class="lb-games">45 games</div></div>
+    </div>
+    <div class="lb-row you">
+      <div class="lb-rank">4</div>
+      <div class="lb-info"><div class="lb-name">FastLynx69 (You)</div><div class="lb-record">12W - 5L - 3D</div></div>
+      <div class="lb-stats"><div class="lb-winrate">60%</div><div class="lb-games">20 games</div></div>
+    </div>
+    <div class="lb-row">
+      <div class="lb-rank">5</div>
+      <div class="lb-info"><div class="lb-name">BoldTiger91</div><div class="lb-record">18W - 14L - 2D</div></div>
+      <div class="lb-stats"><div class="lb-winrate">53%</div><div class="lb-games">34 games</div></div>
+    </div>
+    <div class="lb-row">
+      <div class="lb-rank">6</div>
+      <div class="lb-info"><div class="lb-name">CalmBear55</div><div class="lb-record">15W - 13L - 6D</div></div>
+      <div class="lb-stats"><div class="lb-winrate">44%</div><div class="lb-games">34 games</div></div>
+    </div>
+    <div class="lb-row">
+      <div class="lb-rank">7</div>
+      <div class="lb-info"><div class="lb-name">NightHawk23</div><div class="lb-record">10W - 12L - 3D</div></div>
+      <div class="lb-stats"><div class="lb-winrate">40%</div><div class="lb-games">25 games</div></div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="5 3 19 12 5 21 5 3"/></svg><span class="nav-label">Play</span></div>
+    <div class="nav-item active"><svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="7" width="7" height="13" rx="1"/><rect x="15" y="3" width="7" height="17" rx="1"/></svg><span class="nav-label">Challenge</span></div>
+    <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span class="nav-label">Profile</span></div>
+    <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="nav-label">Hosts</span></div>
+    <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span class="nav-label">History</span></div>
+  </div>
+</div>
+</body>
+</html>
