@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Results Screen</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --text-primary: #1A1A2E;
+    --text-secondary: #6B7B94;
+    --win: #22C55E;
+    --lose: #EF4444;
+    --draw: #F59E0B;
+    --accent: #6C63FF;
+  }
+  html, body {
+    height: 100%;
+    font-family: 'Inter', -apple-system, sans-serif;
+    color: var(--text-primary);
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  .app {
+    max-width: 430px;
+    margin: 0 auto;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+  .bg-image {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 0;
+  }
+  .bg-image img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* === Result Banner === */
+  .result-banner {
+    text-align: center;
+    padding: 20px 0 12px;
+    z-index: 1;
+    position: relative;
+  }
+  .result-emoji { font-size: 40px; }
+  .result-text {
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: 3px;
+    margin-top: 4px;
+  }
+  .result-text.win { color: var(--win); }
+  .result-text.loss { color: var(--lose); }
+
+  /* === Result Details === */
+  .result-details {
+    margin: 8px 20px;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(8px);
+    border-radius: 16px;
+    padding: 16px 18px;
+    z-index: 1;
+    position: relative;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  }
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+  .detail-row:last-child { border-bottom: none; }
+  .detail-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+  .detail-value {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  /* === Payout === */
+  .payout-section {
+    text-align: center;
+    padding: 16px 0;
+    z-index: 1;
+    position: relative;
+  }
+  .payout-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+  }
+  .payout-amount {
+    font-size: 36px;
+    font-weight: 900;
+    margin-top: 4px;
+  }
+
+  /* === Stats Row === */
+  .stats-row {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    padding: 8px 0;
+    z-index: 1;
+    position: relative;
+  }
+  .stat { text-align: center; }
+  .stat-value { font-size: 22px; font-weight: 800; display: block; }
+  .stat-label { font-size: 11px; font-weight: 600; color: var(--text-secondary); letter-spacing: 0.5px; }
+
+  /* === Action Buttons === */
+  .result-actions {
+    padding: 12px 28px;
+    z-index: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .play-again-btn {
+    width: 82%;
+    padding: 18px 0;
+    border: none;
+    border-radius: 50px;
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    cursor: pointer;
+    text-transform: uppercase;
+    color: #FFFFFF;
+    background: linear-gradient(180deg, #555 0%, #333 20%, #1a1a1a 45%, #111 55%, #0a0a0a 100%);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.15);
+    position: relative;
+    overflow: hidden;
+  }
+  .play-again-btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 50%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.05) 100%);
+    border-radius: 50px 50px 0 0;
+    pointer-events: none;
+  }
+  .home-btn {
+    width: 60%;
+    padding: 13px 0;
+    background: transparent;
+    color: var(--text-primary);
+    border: 2.5px solid #2A2A2A;
+    border-radius: 50px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* === Bottom Nav === */
+  .bottom-nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 10px 0 18px;
+    background: #FFFFFF;
+    border-top: 1px solid rgba(0,0,0,0.06);
+    z-index: 2;
+    position: relative;
+    flex-shrink: 0;
+    margin-top: auto;
+  }
+  .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; color: #2A2A2A; }
+  .nav-icon { width: 24px; height: 24px; }
+  .nav-label { font-size: 10px; font-weight: 700; }
+
+  @supports (padding-top: env(safe-area-inset-top)) {
+    .result-banner { padding-top: calc(env(safe-area-inset-top) + 12px); }
+    .bottom-nav { padding-bottom: calc(env(safe-area-inset-bottom) + 8px); }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="bg-image"><img src="assets/background.jpg" alt=""></div>
+
+  <!-- Result Banner -->
+  <div class="result-banner">
+    <div class="result-emoji">🎉</div>
+    <div class="result-text win">YOU WIN</div>
+  </div>
+
+  <!-- Details Card -->
+  <div class="result-details">
+    <div class="detail-row">
+      <span class="detail-label">Your Answer:</span>
+      <span class="detail-value" style="color: var(--win)">Gray Wolf</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">Correct Answer:</span>
+      <span class="detail-value" style="color: var(--win)">Gray Wolf</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">Your Time:</span>
+      <span class="detail-value">2.58s</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">Opponent Time:</span>
+      <span class="detail-value">4.12s</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">Result:</span>
+      <span class="detail-value">Faster correct answer</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">Wager:</span>
+      <span class="detail-value">$1 USDC</span>
+    </div>
+  </div>
+
+  <!-- Payout -->
+  <div class="payout-section">
+    <div class="payout-label">AMOUNT WON</div>
+    <div class="payout-amount" style="color: var(--win)">+$1.90</div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat"><span class="stat-value" style="color: var(--win)">12</span><span class="stat-label">Wins</span></div>
+    <div class="stat"><span class="stat-value" style="color: var(--draw)">3</span><span class="stat-label">Draws</span></div>
+    <div class="stat"><span class="stat-value" style="color: var(--lose)">5</span><span class="stat-label">Losses</span></div>
+  </div>
+
+  <!-- Actions -->
+  <div class="result-actions">
+    <button class="play-again-btn">Play Again</button>
+    <button class="home-btn">Home</button>
+  </div>
+
+  <!-- Bottom Nav -->
+  <div class="bottom-nav">
+    <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg><span class="nav-label">Play</span></div>
+    <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="7" width="7" height="13" rx="1"/><rect x="15" y="3" width="7" height="17" rx="1"/><path d="M9 14h6"/><path d="M9 10h6"/></svg><span class="nav-label">Challenge</span></div>
+    <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span class="nav-label">Profile</span></div>
+    <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="nav-label">Hosts</span></div>
+    <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span class="nav-label">History</span></div>
+  </div>
+</div>
+</body>
+</html>
