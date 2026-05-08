@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sense Bot Tester</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #0a0a1a; color: #fff; font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; height: 100vh; display: flex; flex-direction: column; }
+.toolbar { display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: #1a1a2e; border-bottom: 1px solid rgba(255,255,255,0.1); flex-shrink: 0; }
+.toolbar h1 { font-size: 14px; font-weight: 600; opacity: 0.8; }
+.toolbar button { background: #6C63FF; color: #fff; border: none; padding: 6px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; font-weight: 600; }
+.toolbar button:hover { background: #5A52E0; }
+.toolbar select, .toolbar input { background: #2a2a3e; color: #fff; border: 1px solid rgba(255,255,255,0.15); padding: 5px 10px; border-radius: 6px; font-size: 12px; }
+.toolbar label { font-size: 11px; opacity: 0.6; }
+.grid { display: flex; flex: 1; gap: 2px; padding: 2px; min-height: 0; }
+.player-frame { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.player-label { text-align: center; font-size: 11px; font-weight: 600; padding: 4px; background: #1a1a2e; color: #6C63FF; }
+.player-frame iframe { flex: 1; border: none; width: 100%; min-height: 0; }
+.cols-3 .player-frame { flex: 0 0 calc(33.333% - 2px); }
+.cols-4 .player-frame { flex: 0 0 calc(25% - 2px); }
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <h1>SENSE BOT TESTER</h1>
+  <label>URL:</label>
+  <input type="text" id="gameUrl" value="https://dogmomhq.github.io/sense-react-staging/app/" style="width:340px">
+  <label>Players:</label>
+  <select id="playerCount">
+    <option value="2" selected>2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+  </select>
+  <button onclick="loadFrames()">Load</button>
+  <button onclick="reloadAll()">Reload All</button>
+</div>
+<div class="grid" id="grid"></div>
+<script>
+function loadFrames() {
+  const url = document.getElementById('gameUrl').value.trim();
+  const count = parseInt(document.getElementById('playerCount').value);
+  const grid = document.getElementById('grid');
+  grid.className = 'grid' + (count > 2 ? ' cols-' + count : '');
+  grid.innerHTML = '';
+  for (let i = 0; i < count; i++) {
+    const wrap = document.createElement('div');
+    wrap.className = 'player-frame';
+    const label = document.createElement('div');
+    label.className = 'player-label';
+    label.textContent = 'PLAYER ' + (i + 1);
+    const iframe = document.createElement('iframe');
+    iframe.src = url + (url.includes('?') ? '&' : '?') + '_p=' + (i+1) + '&t=' + Date.now();
+    wrap.appendChild(label);
+    wrap.appendChild(iframe);
+    grid.appendChild(wrap);
+  }
+}
+function reloadAll() {
+  document.querySelectorAll('.player-frame iframe').forEach(f => {
+    f.src = f.src.replace(/&t=\d+/, '&t=' + Date.now());
+  });
+}
+window.addEventListener('DOMContentLoaded', loadFrames);
+</script>
+</body>
+</html>
