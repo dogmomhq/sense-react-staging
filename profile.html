@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Profile</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root { --text-primary: #1A1A2E; --text-secondary: #6B7B94; --accent: #6C63FF; --win: #22C55E; --lose: #EF4444; --draw: #F59E0B; }
+  html, body { height: 100%; font-family: 'Inter', -apple-system, sans-serif; color: var(--text-primary); overflow: hidden; -webkit-font-smoothing: antialiased; }
+  .app { max-width: 430px; margin: 0 auto; height: 100%; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+  .bg-image { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 0; }
+  .bg-image img { width: 100%; height: 100%; object-fit: cover; }
+
+  .profile-content {
+    flex: 1;
+    padding: 20px;
+    z-index: 1;
+    position: relative;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Avatar + Name */
+  .profile-header {
+    text-align: center;
+    padding-bottom: 20px;
+  }
+  .avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6C63FF 0%, #9B8FFF 100%);
+    margin: 0 auto 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: 900;
+    color: #fff;
+  }
+  .profile-name {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+  }
+  .profile-joined {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin-top: 2px;
+  }
+
+  /* Stats Card */
+  .stats-card {
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(8px);
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 14px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  }
+  .stats-card-title {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+  }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    text-align: center;
+  }
+  .sg-value { font-size: 24px; font-weight: 900; display: block; }
+  .sg-label { font-size: 11px; font-weight: 600; color: var(--text-secondary); letter-spacing: 0.5px; }
+
+  /* Info Rows */
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+  .info-row:last-child { border-bottom: none; }
+  .info-label { font-size: 13px; font-weight: 500; color: var(--text-secondary); }
+  .info-value { font-size: 13px; font-weight: 700; }
+
+  /* Wallet Card */
+  .wallet-card {
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(8px);
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 14px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  }
+
+  .disconnect-btn {
+    width: 100%;
+    padding: 13px 0;
+    background: transparent;
+    color: var(--lose);
+    border: 2px solid var(--lose);
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+
+  .bottom-nav { display: flex; justify-content: space-around; align-items: center; padding: 10px 0 18px; background: #FFF; border-top: 1px solid rgba(0,0,0,0.06); z-index: 2; position: relative; flex-shrink: 0; }
+  .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; color: #2A2A2A; }
+  .nav-item.active { color: var(--accent); }
+  .nav-icon { width: 24px; height: 24px; }
+  .nav-label { font-size: 10px; font-weight: 700; }
+  @supports (padding-top: env(safe-area-inset-top)) { .profile-content { padding-top: calc(env(safe-area-inset-top) + 12px); } .bottom-nav { padding-bottom: calc(env(safe-area-inset-bottom) + 8px); } }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="bg-image"><img src="assets/background.jpg" alt=""></div>
+
+  <div class="profile-content">
+    <div class="profile-header">
+      <div class="avatar">F</div>
+      <div class="profile-name">FastLynx69</div>
+      <div class="profile-joined">Joined May 2026</div>
+    </div>
+
+    <div class="stats-card">
+      <div class="stats-card-title">All-Time Stats</div>
+      <div class="stats-grid">
+        <div><span class="sg-value" style="color:var(--win)">12</span><span class="sg-label">Wins</span></div>
+        <div><span class="sg-value" style="color:var(--draw)">3</span><span class="sg-label">Draws</span></div>
+        <div><span class="sg-value" style="color:var(--lose)">5</span><span class="sg-label">Losses</span></div>
+      </div>
+    </div>
+
+    <div class="stats-card">
+      <div class="stats-card-title">Performance</div>
+      <div class="info-row"><span class="info-label">Win Rate</span><span class="info-value" style="color:var(--win)">60%</span></div>
+      <div class="info-row"><span class="info-label">Avg Response Time</span><span class="info-value">3.2s</span></div>
+      <div class="info-row"><span class="info-label">Total Games</span><span class="info-value">20</span></div>
+      <div class="info-row"><span class="info-label">Net Earnings</span><span class="info-value" style="color:var(--win)">+$8.40</span></div>
+      <div class="info-row"><span class="info-label">Best Streak</span><span class="info-value">5 wins</span></div>
+    </div>
+
+    <div class="wallet-card">
+      <div class="stats-card-title">Wallet</div>
+      <div class="info-row"><span class="info-label">Address</span><span class="info-value" style="font-size:11px">7xKq...m4Fp</span></div>
+      <div class="info-row"><span class="info-label">USDC Balance</span><span class="info-value">$11.36</span></div>
+      <div class="info-row"><span class="info-label">SOL Balance</span><span class="info-value">0.42</span></div>
+      <button class="disconnect-btn">Disconnect Wallet</button>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="5 3 19 12 5 21 5 3"/></svg><span class="nav-label">Play</span></div>
+    <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="7" width="7" height="13" rx="1"/><rect x="15" y="3" width="7" height="17" rx="1"/><path d="M9 14h6"/><path d="M9 10h6"/></svg><span class="nav-label">Challenge</span></div>
+    <div class="nav-item active"><svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span class="nav-label">Profile</span></div>
+    <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="nav-label">Hosts</span></div>
+    <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span class="nav-label">History</span></div>
+  </div>
+</div>
+</body>
+</html>
