@@ -4,111 +4,75 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<title>COMMON SENSE — All Screens</title>
+<title>Sense — All Screens</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-    background: #111;
-    color: #fff;
-    min-height: 100vh;
-  }
-  h1 {
-    text-align: center;
-    padding: 24px 0 8px;
-    font-size: 20px;
-    font-weight: 800;
-    letter-spacing: 2px;
-    color: #fff;
-  }
-  .subtitle {
-    text-align: center;
-    font-size: 12px;
-    color: #666;
-    padding-bottom: 20px;
-    letter-spacing: 1px;
-  }
-  .screens {
-    display: flex;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    gap: 16px;
-    padding: 0 20px 30px;
-  }
-  .screen-col {
-    flex-shrink: 0;
-    scroll-snap-align: start;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  .screen-label {
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    padding: 8px 0;
-    color: #7B8DB8;
-  }
-  .screen-frame {
-    width: 320px;
-    height: 640px;
-    border-radius: 20px;
+  body { font-family: 'Inter', sans-serif; background: #0F0F13; color: #fff; min-height: 100vh; }
+  .header { padding: 32px 40px 20px; }
+  .header h1 { font-size: 28px; font-weight: 900; letter-spacing: -0.5px; }
+  .header p { font-size: 14px; color: #888; margin-top: 4px; }
+  .gallery { display: flex; gap: 28px; padding: 12px 40px 40px; overflow-x: auto; -webkit-overflow-scrolling: touch; scroll-snap-type: x mandatory; }
+  .gallery::-webkit-scrollbar { height: 6px; }
+  .gallery::-webkit-scrollbar-track { background: #1a1a1f; border-radius: 3px; }
+  .gallery::-webkit-scrollbar-thumb { background: #6C63FF; border-radius: 3px; }
+  .screen-card { flex-shrink: 0; scroll-snap-align: start; }
+  .screen-label { font-size: 13px; font-weight: 700; color: #aaa; margin-bottom: 10px; text-align: center; letter-spacing: 1px; text-transform: uppercase; }
+  .phone-frame {
+    width: 375px; height: 812px;
+    border-radius: 40px;
     overflow: hidden;
-    border: 2px solid #333;
+    border: 3px solid #2a2a2f;
     background: #fff;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
   }
-  .screen-frame iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-    transform-origin: 0 0;
-  }
-
-  /* On mobile, make frames larger */
+  .phone-frame iframe { width: 100%; height: 100%; border: none; }
   @media (max-width: 600px) {
-    .screens {
-      gap: 12px;
-      padding: 0 12px 24px;
-    }
-    .screen-frame {
-      width: 280px;
-      height: 560px;
-    }
+    .header { padding: 20px 16px 12px; }
+    .header h1 { font-size: 22px; }
+    .gallery { padding: 8px 16px 24px; gap: 16px; }
+    .phone-frame { width: 320px; height: 693px; border-radius: 34px; }
   }
-
-  /* Scrollbar styling */
-  .screens::-webkit-scrollbar { height: 6px; }
-  .screens::-webkit-scrollbar-track { background: #222; border-radius: 3px; }
-  .screens::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
 </style>
 </head>
 <body>
-  <h1>COMMON SENSE</h1>
-  <p class="subtitle">REDESIGN PREVIEW — SCROLL TO SEE ALL SCREENS</p>
-
-  <div class="screens">
-    <div class="screen-col">
-      <div class="screen-label">LANDING</div>
-      <div class="screen-frame">
-        <iframe src="mockup.html?v=5" loading="lazy"></iframe>
-      </div>
-    </div>
-
-    <div class="screen-col">
-      <div class="screen-label">QUESTION</div>
-      <div class="screen-frame">
-        <iframe src="question.html?v=5" loading="lazy"></iframe>
-      </div>
-    </div>
-
-    <div class="screen-col">
-      <div class="screen-label">RESULTS — WIN</div>
-      <div class="screen-frame">
-        <iframe src="results.html?v=5" loading="lazy"></iframe>
-      </div>
-    </div>
+<div class="header">
+  <h1>COMMON SENSE — All Screens</h1>
+  <p>Scroll to see all 8 screens. Design preview — not functional.</p>
+</div>
+<div class="gallery">
+  <div class="screen-card">
+    <div class="screen-label">1. Landing</div>
+    <div class="phone-frame"><iframe src="mockup.html?v=5"></iframe></div>
   </div>
+  <div class="screen-card">
+    <div class="screen-label">2. Matchmaking</div>
+    <div class="phone-frame"><iframe src="matchmaking.html?v=1"></iframe></div>
+  </div>
+  <div class="screen-card">
+    <div class="screen-label">3. Question</div>
+    <div class="phone-frame"><iframe src="question.html?v=5"></iframe></div>
+  </div>
+  <div class="screen-card">
+    <div class="screen-label">4. Result — Win</div>
+    <div class="phone-frame"><iframe src="results.html?v=5"></iframe></div>
+  </div>
+  <div class="screen-card">
+    <div class="screen-label">5. Result — Loss</div>
+    <div class="phone-frame"><iframe src="results-loss.html?v=1"></iframe></div>
+  </div>
+  <div class="screen-card">
+    <div class="screen-label">6. Result — Draw</div>
+    <div class="phone-frame"><iframe src="results-draw.html?v=1"></iframe></div>
+  </div>
+  <div class="screen-card">
+    <div class="screen-label">7. Leaderboard</div>
+    <div class="phone-frame"><iframe src="leaderboard.html?v=1"></iframe></div>
+  </div>
+  <div class="screen-card">
+    <div class="screen-label">8. Profile</div>
+    <div class="phone-frame"><iframe src="profile.html?v=1"></iframe></div>
+  </div>
+</div>
 </body>
 </html>
