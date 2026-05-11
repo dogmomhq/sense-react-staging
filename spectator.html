@@ -29,6 +29,31 @@ body { background: #0d1520; color: #ccdde8; font-family: system-ui, -apple-syste
 .tile iframe { width: 100%; height: 520px; border: none; pointer-events: none; /* bots auto-play, no manual clicks */ transform-origin: top left; }
 .pause-overlay { position: absolute; inset: 0; z-index: 5; display: flex; align-items: center; justify-content: center; background: rgba(13,21,32,0.6); }
 .pause-overlay span { font-size: 28px; }
+
+/* Live server log panel */
+.log-panel { border-top: 1px solid #1a2a3a; margin-top: 4px; }
+.log-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 16px; background: #111d2b; }
+.log-header h2 { font-size: 12px; font-weight: 600; color: #44ccdd; }
+.log-header .log-status { font-size: 9px; color: #445566; }
+.log-header .log-status.live { color: #00d4aa; }
+.log-stats { display: flex; gap: 12px; padding: 4px 16px; background: #0f1922; font-size: 10px; color: #667788; flex-wrap: wrap; }
+.log-stats .stat { display: flex; gap: 4px; }
+.log-stats .stat-val { color: #44ccdd; font-weight: 600; }
+.log-stats .stat-val.warn { color: #ffaa33; }
+.log-body { max-height: 260px; overflow-y: auto; padding: 4px 0; background: #0a1018; font-family: 'SF Mono', 'Menlo', monospace; font-size: 10px; line-height: 1.6; }
+.log-row { padding: 1px 16px; border-bottom: 1px solid #0f1520; display: flex; gap: 8px; }
+.log-row:hover { background: #111d2b; }
+.log-time { color: #445566; min-width: 70px; flex-shrink: 0; }
+.log-msg { color: #8899aa; word-break: break-all; }
+.log-msg .ev-queue { color: #6688cc; }
+.log-msg .ev-created { color: #ffaa33; }
+.log-msg .ev-joined { color: #00d4aa; }
+.log-msg .ev-rate { color: #ff4757; }
+.log-msg .ev-ghost { color: #ff6b81; }
+.log-msg .ev-expire { color: #ff4757; }
+.log-open, .log-active { padding: 4px 16px; font-size: 10px; color: #667788; border-bottom: 1px solid #0f1520; }
+.log-open span, .log-active span { color: #44ccdd; }
+.log-active span { color: #00d4aa; }
 </style>
 </head><body>
 <div class="header">
@@ -46,6 +71,19 @@ body { background: #0d1520; color: #ccdde8; font-family: system-ui, -apple-syste
 <div class="grid" id="grid">
   <div style="grid-column:1/-1;text-align:center;color:#445566;padding:40px;font-size:12px">
     Click "+ Add Bot" to launch a real game instance
+  </div>
+</div>
+
+<!-- Live Server Log Panel -->
+<div class="log-panel">
+  <div class="log-header">
+    <h2>Server Log</h2>
+    <span class="log-status" id="log-status">connecting...</span>
+  </div>
+  <div class="log-stats" id="log-stats"></div>
+  <div id="log-games"></div>
+  <div class="log-body" id="log-body">
+    <div style="padding:12px 16px;color:#445566">Waiting for server data...</div>
   </div>
 </div>
 
@@ -138,5 +176,102 @@ document.getElementById('stop-btn').onclick = () => {
   document.getElementById('st-count').textContent = '0';
   document.getElementById('grid').innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#445566;padding:40px;font-size:12px">Stopped. Click + Add Bot to start again.</div>';
 };
+
+// ─── Live Server Log ───
+const LOG_URL = 'https://web-production-c6ec6.up.railway.app/api/debug/queue';
+let seenEvents = new Set();
+
+function colorize(msg) {
+  if (msg.startsWith('RATE_LIMIT')) return `<span class="ev-rate">${msg}</span>`;
+  if (msg.startsWith('JOINED')) return `<span class="ev-joined">${msg}</span>`;
+  if (msg.startsWith('CREATED')) return `<span class="ev-created">${msg}</span>`;
+  if (msg.startsWith('QUEUE')) return `<span class="ev-queue">${msg}</span>`;
+  if (msg.includes('GHOST') || msg.includes('EXPIRE') || msg.includes('ORPHAN')) return `<span class="ev-expire">${msg}</span>`;
+  return msg;
+}
+
+function fmtTime(iso) {
+  const d = new Date(iso);
+  return d.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+
+function ago(iso) {
+  const s = Math.round((Date.now() - new Date(iso).getTime()) / 1000);
+  if (s < 60) return s + 's ago';
+  return Math.floor(s / 60) + 'm ' + (s % 60) + 's ago';
+}
+
+async function pollLog() {
+  const status = document.getElementById('log-status');
+  try {
+    const r = await fetch(LOG_URL);
+    const d = await r.json();
+    status.textContent = 'live';
+    status.className = 'log-status live';
+
+    // Stats bar
+    const stats = d.stats || {};
+    document.getElementById('log-stats').innerHTML =
+      `<div class="stat">Open: <span class="stat-val${(stats.open||0)>0?' warn':''}">${stats.open||0}</span></div>` +
+      `<div class="stat">Active: <span class="stat-val">${d.active?.length||0}</span></div>` +
+      `<div class="stat">WS: <span class="stat-val">${d.wsRegistrySize||0}</span></div>` +
+      `<div class="stat">Connections: <span class="stat-val">${d.totalConnections||0}</span></div>` +
+      `<div class="stat">Settled: <span class="stat-val">${stats.settled||0}</span></div>` +
+      `<div class="stat">Expired: <span class="stat-val">${stats.expired||0}</span></div>`;
+
+    // Open & active games
+    let gamesHtml = '';
+    if (d.open?.length) {
+      gamesHtml += '<div class="log-open">';
+      d.open.forEach(g => {
+        gamesHtml += `Open: <span>${g.player_a}</span> waiting (${g.match_id}) — ${ago(g.created_at)} · `;
+      });
+      gamesHtml += '</div>';
+    }
+    if (d.active?.length) {
+      gamesHtml += '<div class="log-active">';
+      d.active.forEach(g => {
+        const aIcon = g.a_answered ? '✓' : '…';
+        const bIcon = g.b_answered ? '✓' : '…';
+        gamesHtml += `Active: <span>${g.player_a}</span> ${aIcon} vs <span>${g.player_b}</span> ${bIcon} (${g.match_id}) — ${ago(g.matched_at)} · `;
+      });
+      gamesHtml += '</div>';
+    }
+    document.getElementById('log-games').innerHTML = gamesHtml;
+
+    // Events — only add new ones
+    const body = document.getElementById('log-body');
+    const events = d.recentEvents || [];
+    let added = false;
+    events.forEach(e => {
+      const key = e.t + e.msg;
+      if (seenEvents.has(key)) return;
+      seenEvents.add(key);
+      added = true;
+      const row = document.createElement('div');
+      row.className = 'log-row';
+      row.innerHTML = `<span class="log-time">${fmtTime(e.t)}</span><span class="log-msg">${colorize(e.msg)}</span>`;
+      body.appendChild(row);
+    });
+    // Auto-scroll if new events
+    if (added) body.scrollTop = body.scrollHeight;
+    // Remove placeholder
+    const ph = body.querySelector('div[style]');
+    if (ph && events.length) ph.remove();
+
+    // Keep seen set from growing unbounded
+    if (seenEvents.size > 500) {
+      const arr = [...seenEvents];
+      seenEvents = new Set(arr.slice(-200));
+    }
+  } catch (e) {
+    status.textContent = 'error';
+    status.className = 'log-status';
+  }
+}
+
+// Poll every 2 seconds
+pollLog();
+setInterval(pollLog, 2000);
 </script>
 </body></html>
