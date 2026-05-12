@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pre-Question Countdown Concepts — Sense</title>
+<title>Animal Countdown Concepts — Sense</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #111; color: #fff; min-height: 100vh; }
@@ -22,10 +22,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 .countdown-stage { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 200; }
 
-.replay-btn { display: block; margin: 16px auto 40px; padding: 14px 40px; background: #7c5cfc; border: none; border-radius: 14px; color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; letter-spacing: 0.5px; }
-.replay-btn:hover { background: #6a4aed; transform: scale(1.02); }
+.replay-btn { display: block; margin: 16px auto 40px; padding: 14px 40px; background: #7c5cfc; border: none; border-radius: 14px; color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; }
+.replay-btn:hover { background: #6a4aed; }
 
-/* Fake game UI behind countdown */
 .fake-game { position: absolute; inset: 0; padding: 80px 20px 20px; opacity: 0.15; }
 .fake-header { text-align: center; font-size: 13px; font-weight: 600; color: #666; letter-spacing: 1px; margin-bottom: 30px; }
 .fake-image { width: 200px; height: 200px; background: #e0e0e0; border-radius: 16px; margin: 0 auto 20px; }
@@ -36,11 +35,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 <body>
 
 <div class="selector">
-  <button class="active" onclick="pick(0)">1. Heartbeat</button>
-  <button onclick="pick(1)">2. Shatter</button>
-  <button onclick="pick(2)">3. War Drums</button>
-  <button onclick="pick(3)">4. Lockdown</button>
-  <button onclick="pick(4)">5. Void Rip</button>
+  <button class="active" onclick="pick(0)">1. Prowl</button>
+  <button onclick="pick(1)">2. Stampede</button>
+  <button onclick="pick(2)">3. Eyes</button>
+  <button onclick="pick(3)">4. Pulse</button>
+  <button onclick="pick(4)">5. Pounce</button>
 </div>
 
 <div class="concept-info" id="info"></div>
@@ -59,423 +58,604 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 let current = 0;
 let timers = [];
 let intervals = [];
-let animFrames = [];
 
 const concepts = [
   {
-    name: "Heartbeat",
-    desc: "Each number throbs like a cardiac beat — fast punch outward, slow elastic contraction. Screen edges pulse with a red vignette on impact. BPM accelerates: 3 is calm, 2 is nervous, 1 is racing. The background dims between beats like the space between heartbeats. On GO the heart STOPS — white flash defibrillator shock."
+    name: "The Prowl",
+    desc: "A predator is stalking. Paw prints pad across the screen one by one — slow, deliberate, getting closer. Each footfall shakes the ground more. The numbers breathe like a crouching animal. On GO the predator POUNCES — claw marks slash across the screen revealing the question."
   },
   {
-    name: "Glass Shatter",
-    desc: "The screen is a pane of glass. 3 cracks it — hairline fractures radiate from the number. 2 shatters deeper — chunks separate, you see through to the game underneath. 1 is barely holding — the whole screen vibrates. GO smashes it completely — glass shards fly outward revealing the question. Each impact has a heavy thud shake."
+    name: "Stampede",
+    desc: "Dust kicks up from the bottom. The ground rumbles — faintly at first. Hoofprints and animal silhouettes streak across the background, building speed. 3 is a distant tremor. 2 the herd is closer. 1 is a full stampede shaking everything. GO — they burst through the screen."
   },
   {
-    name: "War Drums",
-    desc: "Concentric rings pulse outward from each number like drum hits on water. 3 is one ring — subtle. 2 is two rings — stronger. 1 is three rings erupting — the screen shakes. Each hit the background darkens like a war march. GO unleashes a final massive ring that fills the entire screen and dissolves into the question."
+    name: "Predator Eyes",
+    desc: "Screen goes dark like night jungle. Two glowing eyes appear — watching, blinking. On each count they get closer and more intense, the pupils narrow. Other eyes appear in the periphery. Foliage shadows shift. On GO the eyes lunge forward — the hunt is ON."
   },
   {
-    name: "Lockdown Protocol",
-    desc: "Military/hacker aesthetic. Screen flickers with scan lines. 3 — 'INITIALIZING TARGET' with a scanning crosshair. 2 — 'LOCKING ON' crosshair tightens. 1 — 'TARGET ACQUIRED' crosshair snaps to center, screen goes red alert. GO — 'ENGAGE' with full screen wipe. Each step has data noise and glitch effects."
+    name: "Heartbeat of the Wild",
+    desc: "An animal heartbeat thumps — you see concentric ripples like sonar pings emanating from a paw print in the center. Each beat the print glows hotter, amber→orange→red. Tribal pattern rings expand outward. The rhythm accelerates like a cornered animal. GO — the heart ROARS."
   },
   {
-    name: "Void Rip",
-    desc: "Screen starts normal, then a crack in reality opens in the center. 3 — small tear with purple energy leaking through. 2 — the tear widens, pulling the edges of the screen inward like gravity. 1 — the void is massive, everything is being sucked in, particles stream toward center. GO — reality snaps back with a shockwave that pushes everything outward."
+    name: "The Pounce",
+    desc: "A coiled spring. The number crouches LOW on each count — squashing down, compressing, loading energy. 3 dips slightly. 2 crouches deeper. 1 is fully loaded, vibrating with tension. GO — LAUNCHES upward with massive force, claw trails and motion blur streaking behind it."
   }
 ];
 
 function haptic(ms) { if (navigator.vibrate) navigator.vibrate(ms); }
-
 function pick(i) {
   current = i;
   document.querySelectorAll('.selector button').forEach((b,j) => b.classList.toggle('active', j===i));
   play();
 }
-
 function clearAll() {
   timers.forEach(clearTimeout); intervals.forEach(clearInterval);
-  animFrames.forEach(cancelAnimationFrame);
-  timers = []; intervals = []; animFrames = [];
+  timers = []; intervals = [];
 }
-
 function t(fn, ms) { const id = setTimeout(fn, ms); timers.push(id); return id; }
 
 function play() {
   clearAll();
-  const info = document.getElementById('info');
-  info.innerHTML = `<h2>${concepts[current].name}</h2><p>${concepts[current].desc}</p>`;
+  document.getElementById('info').innerHTML = `<h2>${concepts[current].name}</h2><p>${concepts[current].desc}</p>`;
   const stage = document.getElementById('stage');
   stage.innerHTML = '';
   stage.style.cssText = '';
-  [concept1, concept2, concept3, concept4, concept5][current](stage);
+  [prowl, stampede, eyes, heartbeatWild, pounce][current](stage);
 }
 
-// ======== 1. HEARTBEAT ========
-function concept1(stage) {
-  stage.style.background = '#fff';
+// ======== 1. THE PROWL ========
+function prowl(stage) {
+  stage.style.background = 'linear-gradient(180deg, #f5f0e8 0%, #e8dfd0 100%)';
 
-  // Vignette element
-  const vig = document.createElement('div');
-  vig.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:5;opacity:0;transition:opacity 0.12s;background:radial-gradient(ellipse at center, transparent 30%, rgba(180,40,40,0.25) 100%);';
-  stage.appendChild(vig);
-
-  // Number container
   const numEl = document.createElement('div');
-  numEl.style.cssText = 'font-size:140px;font-weight:900;color:#7c5cfc;position:relative;z-index:10;opacity:0;';
+  numEl.style.cssText = 'font-size:140px;font-weight:900;color:#7c5cfc;z-index:10;position:relative;opacity:0;';
   stage.appendChild(numEl);
 
   const labelEl = document.createElement('div');
-  labelEl.style.cssText = 'font-size:16px;font-weight:700;color:#999;letter-spacing:3px;text-transform:uppercase;margin-top:8px;z-index:10;opacity:0;transition:opacity 0.3s;';
+  labelEl.style.cssText = 'font-size:14px;font-weight:700;color:#999;letter-spacing:3px;text-transform:uppercase;margin-top:8px;z-index:10;opacity:0;';
   labelEl.textContent = 'GET READY';
   stage.appendChild(labelEl);
 
-  // Sub-pulse ring
-  const ring = document.createElement('div');
-  ring.style.cssText = 'position:absolute;width:180px;height:180px;border-radius:50%;border:3px solid rgba(124,92,252,0.2);z-index:4;opacity:0;';
-  stage.appendChild(ring);
-
-  function beat(num, delay, intensity, bpm) {
+  // Paw print function
+  function spawnPaw(x, y, size, delay, opacity) {
     t(() => {
-      numEl.textContent = num;
-      numEl.style.opacity = '1';
-      labelEl.style.opacity = '1';
+      // Main pad
+      const paw = document.createElement('div');
+      paw.style.cssText = `position:absolute;left:${x}px;top:${y}px;z-index:5;opacity:0;transform:scale(0.5);transition:all 0.25s cubic-bezier(0.34,1.56,0.64,1);`;
 
-      // Thump animation — fast punch out, slow elastic return
-      numEl.style.transition = 'none';
-      numEl.style.transform = `scale(2.2)`;
-      numEl.style.opacity = '0.3';
+      const pad = document.createElement('div');
+      pad.style.cssText = `width:${size}px;height:${size*0.8}px;background:rgba(80,60,40,${opacity});border-radius:50% 50% 45% 45%;position:relative;`;
 
-      // Ring burst
-      ring.style.transition = 'none';
-      ring.style.transform = 'scale(0.5)';
-      ring.style.opacity = '0.6';
-
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          numEl.style.transition = `transform 0.5s cubic-bezier(0.34,1.56,0.64,1), opacity 0.15s ease`;
-          numEl.style.transform = 'scale(1)';
-          numEl.style.opacity = '1';
-
-          ring.style.transition = 'all 0.6s ease-out';
-          ring.style.transform = `scale(${2 + intensity})`;
-          ring.style.opacity = '0';
-        });
+      // Toe beans
+      const toes = [[0.15,-0.35],[0.5,-0.45],[0.85,-0.35],[0,-0.05],[1,-0.05]];
+      toes.slice(0,4).forEach(([tx,ty]) => {
+        const toe = document.createElement('div');
+        const toeSize = size * 0.22;
+        toe.style.cssText = `position:absolute;width:${toeSize}px;height:${toeSize}px;background:rgba(80,60,40,${opacity});border-radius:50%;left:${tx*size-toeSize/2}px;top:${ty*size}px;`;
+        pad.appendChild(toe);
       });
 
-      // Vignette pulse
-      vig.style.opacity = String(0.3 + intensity * 0.3);
-      t(() => { vig.style.opacity = '0'; }, 150);
+      paw.appendChild(pad);
+      stage.appendChild(paw);
 
-      // Shake
-      const shk = intensity * 6;
-      stage.style.transform = `translate(${(Math.random()-0.5)*shk}px, ${(Math.random()-0.5)*shk*0.6}px)`;
+      requestAnimationFrame(() => {
+        paw.style.opacity = '1';
+        paw.style.transform = 'scale(1)';
+      });
+
+      // Ground impact
+      const shk = size * 0.08;
+      stage.style.transform = `translate(${(Math.random()-0.5)*shk}px, ${shk*0.5}px)`;
       t(() => { stage.style.transform = ''; }, 100);
-
-      // Dim between beats
-      t(() => {
-        if (num !== '1') {
-          numEl.style.transition = 'opacity 0.3s ease';
-          numEl.style.opacity = '0.15';
-          stage.style.background = `rgb(${250 - intensity*30}, ${250 - intensity*30}, ${252 - intensity*20})`;
-        }
-      }, 400);
-
-      haptic(Math.floor(10 + intensity * 30));
+      haptic(Math.floor(size * 0.3));
     }, delay);
   }
 
-  // 3 — calm (75bpm feel)
-  beat('3', 100, 0.3, 75);
-  // 2 — nervous (110bpm feel)
-  beat('2', 900, 0.6, 110);
-  // 1 — racing (150bpm feel)
-  beat('1', 1600, 1.0, 150);
+  // Paw prints walking across — getting bigger (closer)
+  spawnPaw(80, 520, 22, 100, 0.15);
+  spawnPaw(160, 480, 24, 300, 0.18);
+  spawnPaw(100, 420, 28, 500, 0.22);
 
-  // GO — defibrillator shock
+  // 3
   t(() => {
-    // White flash
-    numEl.textContent = 'GO';
-    numEl.style.fontSize = '80px';
-    numEl.style.color = '#22c55e';
+    numEl.textContent = '3';
+    numEl.style.opacity = '1';
+    labelEl.style.opacity = '1';
     numEl.style.transition = 'none';
-    numEl.style.transform = 'scale(2.5)';
+    numEl.style.transform = 'scale(1.1)';
+    requestAnimationFrame(() => {
+      numEl.style.transition = 'all 0.5s cubic-bezier(0.34,1.56,0.64,1)';
+      numEl.style.transform = 'scale(0.95)';
+    });
+  }, 100);
+
+  spawnPaw(220, 370, 32, 700, 0.25);
+  spawnPaw(140, 300, 36, 850, 0.3);
+
+  // 2
+  t(() => {
+    numEl.textContent = '2';
+    numEl.style.transition = 'none';
+    numEl.style.transform = 'scale(1.15)';
+    requestAnimationFrame(() => {
+      numEl.style.transition = 'all 0.5s cubic-bezier(0.34,1.56,0.64,1)';
+      numEl.style.transform = 'scale(0.93)';
+    });
+    haptic(20);
+  }, 900);
+
+  spawnPaw(260, 260, 42, 1100, 0.35);
+  spawnPaw(170, 200, 48, 1350, 0.4);
+
+  // 1 — it's RIGHT HERE
+  t(() => {
+    numEl.textContent = '1';
+    numEl.style.transition = 'none';
+    numEl.style.transform = 'scale(1.3)';
+    requestAnimationFrame(() => {
+      numEl.style.transition = 'all 0.5s cubic-bezier(0.34,1.56,0.64,1)';
+      numEl.style.transform = 'scale(0.9)';
+    });
+
+    // Tension vibration
+    let vc = 0;
+    const vib = setInterval(() => {
+      vc++;
+      const v = 1.5 + vc * 0.3;
+      stage.style.transform = `translate(${(Math.random()-0.5)*v}px, ${(Math.random()-0.5)*v*0.5}px)`;
+      if (vc > 18) { clearInterval(vib); stage.style.transform = ''; }
+    }, 30);
+    intervals.push(vib);
+    haptic(30);
+  }, 1600);
+
+  // Biggest print right in center
+  spawnPaw(155, 340, 55, 1650, 0.5);
+
+  // GO — CLAW SLASH
+  t(() => {
     numEl.style.opacity = '0';
     labelEl.style.opacity = '0';
 
-    stage.style.background = '#fff';
-
-    // Flash overlay
-    const flash = document.createElement('div');
-    flash.style.cssText = 'position:absolute;inset:0;background:rgba(255,255,255,1);z-index:20;opacity:1;transition:opacity 0.4s ease;';
-    stage.appendChild(flash);
-
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        numEl.style.transition = 'all 0.3s cubic-bezier(0.34,1.56,0.64,1)';
-        numEl.style.transform = 'scale(1)';
-        numEl.style.opacity = '1';
-        flash.style.opacity = '0';
-      });
-    });
-
-    haptic(50);
-
-    // Clear
-    t(() => {
-      stage.style.transition = 'opacity 0.3s';
-      stage.style.opacity = '0';
-    }, 600);
-  }, 2300);
-}
-
-// ======== 2. GLASS SHATTER ========
-function concept2(stage) {
-  stage.style.background = '#fff';
-
-  const numEl = document.createElement('div');
-  numEl.style.cssText = 'font-size:150px;font-weight:900;color:#7c5cfc;z-index:10;position:relative;opacity:0;';
-  stage.appendChild(numEl);
-
-  const labelEl = document.createElement('div');
-  labelEl.style.cssText = 'font-size:16px;font-weight:700;color:#999;letter-spacing:3px;text-transform:uppercase;margin-top:8px;z-index:10;opacity:0;';
-  labelEl.textContent = 'GET READY';
-  stage.appendChild(labelEl);
-
-  // Crack SVG overlay
-  const crackSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  crackSvg.setAttribute('viewBox', '0 0 380 720');
-  crackSvg.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;z-index:8;pointer-events:none;';
-  stage.appendChild(crackSvg);
-
-  // Glass frost overlay
-  const frost = document.createElement('div');
-  frost.style.cssText = 'position:absolute;inset:0;z-index:7;pointer-events:none;opacity:0;transition:opacity 0.2s;background:linear-gradient(135deg, rgba(255,255,255,0) 0%, rgba(200,200,220,0.1) 50%, rgba(255,255,255,0) 100%);';
-  stage.appendChild(frost);
-
-  function addCracks(cx, cy, count, length, intensity) {
-    for (let i = 0; i < count; i++) {
-      const angle = (Math.PI * 2 / count) * i + (Math.random() - 0.5) * 0.8;
-      const len = length * (0.6 + Math.random() * 0.8);
-      let x = cx, y = cy;
-      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      let d = `M ${x} ${y}`;
-      const segments = 3 + Math.floor(Math.random() * 4);
-      for (let s = 0; s < segments; s++) {
-        const segLen = len / segments;
-        const jitter = (Math.random() - 0.5) * 30;
-        x += Math.cos(angle + jitter * 0.05) * segLen;
-        y += Math.sin(angle + jitter * 0.05) * segLen;
-        d += ` L ${x} ${y}`;
-        // Branch
-        if (Math.random() < 0.3 * intensity) {
-          const bAngle = angle + (Math.random() - 0.5) * 1.5;
-          const bLen = segLen * 0.5;
-          const bx = x + Math.cos(bAngle) * bLen;
-          const by = y + Math.sin(bAngle) * bLen;
-          const branch = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-          branch.setAttribute('d', `M ${x} ${y} L ${bx} ${by}`);
-          branch.setAttribute('stroke', 'rgba(100,100,120,0.4)');
-          branch.setAttribute('stroke-width', '1');
-          branch.setAttribute('fill', 'none');
-          crackSvg.appendChild(branch);
-        }
-      }
-      path.setAttribute('d', d);
-      path.setAttribute('stroke', `rgba(80,80,100,${0.3 + intensity * 0.3})`);
-      path.setAttribute('stroke-width', String(1 + intensity));
-      path.setAttribute('fill', 'none');
-      // Animate drawing
-      const totalLen = path.getTotalLength ? 500 : 500;
-      path.style.strokeDasharray = totalLen;
-      path.style.strokeDashoffset = totalLen;
-      path.style.transition = `stroke-dashoffset ${0.3 + Math.random()*0.2}s ease-out`;
-      crackSvg.appendChild(path);
-      requestAnimationFrame(() => { path.style.strokeDashoffset = '0'; });
-    }
-  }
-
-  function impact(num, delay, intensity) {
-    t(() => {
-      numEl.textContent = num;
-      numEl.style.opacity = '1';
-      labelEl.style.opacity = '1';
-      numEl.style.transition = 'none';
-      numEl.style.transform = 'scale(2) rotate(-5deg)';
-
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          numEl.style.transition = 'all 0.35s cubic-bezier(0.34,1.56,0.64,1)';
-          numEl.style.transform = 'scale(1) rotate(0deg)';
-        });
-      });
-
-      // Add cracks from impact point
-      const cx = 190 + (Math.random()-0.5)*60;
-      const cy = 320 + (Math.random()-0.5)*80;
-      addCracks(cx, cy, 4 + Math.floor(intensity * 6), 80 + intensity * 120, intensity);
-
-      // Frost builds
-      frost.style.opacity = String(intensity * 0.4);
-
-      // Shake — heavier each time
-      const shk = 4 + intensity * 14;
-      stage.style.transform = `translate(${(Math.random()-0.5)*shk}px, ${(Math.random()-0.5)*shk}px)`;
-      t(() => { stage.style.transform = ''; }, 120);
-
-      haptic(Math.floor(15 + intensity * 40));
-
-      // Vibrate on 1
-      if (num === '1') {
-        let vibCount = 0;
-        const vibrate = setInterval(() => {
-          vibCount++;
-          const v = 2 + Math.random() * 3;
-          stage.style.transform = `translate(${(Math.random()-0.5)*v}px, ${(Math.random()-0.5)*v}px)`;
-          if (vibCount > 15) { clearInterval(vibrate); stage.style.transform = ''; }
-        }, 30);
-        intervals.push(vibrate);
-      }
-    }, delay);
-  }
-
-  impact('3', 100, 0.2);
-  impact('2', 900, 0.5);
-  impact('1', 1600, 1.0);
-
-  // GO — full shatter
-  t(() => {
-    numEl.textContent = 'GO';
-    numEl.style.fontSize = '80px';
-    numEl.style.color = '#22c55e';
-    numEl.style.transition = 'none';
-    numEl.style.transform = 'scale(3)';
-
-    // Spawn glass shards
-    for (let i = 0; i < 30; i++) {
-      const shard = document.createElement('div');
-      const size = 10 + Math.random() * 40;
-      const startX = Math.random() * 380;
-      const startY = Math.random() * 720;
-      shard.style.cssText = `
-        position:absolute;left:${startX}px;top:${startY}px;
-        width:${size}px;height:${size * (0.4+Math.random()*0.8)}px;
-        background:linear-gradient(${Math.random()*360}deg, rgba(200,200,220,0.6), rgba(255,255,255,0.3));
-        clip-path:polygon(${Math.random()*30}% 0%, 100% ${Math.random()*40}%, ${60+Math.random()*40}% 100%, 0% ${60+Math.random()*40}%);
-        z-index:15;opacity:1;transition:all 0.6s cubic-bezier(0.25,0.46,0.45,0.94);
-        backdrop-filter:blur(1px);
+    // Claw marks
+    for (let i = 0; i < 3; i++) {
+      const claw = document.createElement('div');
+      const startX = 120 + i * 60;
+      claw.style.cssText = `
+        position:absolute;left:${startX}px;top:-50px;width:8px;height:0;
+        background:linear-gradient(180deg, transparent, rgba(200,80,20,0.6), rgba(200,80,20,0.8), transparent);
+        z-index:20;border-radius:4px;transform:rotate(${-5+i*5}deg);
+        transition:height 0.2s ease-in;
       `;
-      stage.appendChild(shard);
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          const angle = Math.atan2(startY - 360, startX - 190);
-          shard.style.transform = `translate(${Math.cos(angle)*200}px, ${Math.sin(angle)*200}px) rotate(${Math.random()*180}deg)`;
-          shard.style.opacity = '0';
-        });
-      });
+      stage.appendChild(claw);
+      t(() => { claw.style.height = '820px'; }, i * 40);
     }
 
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        numEl.style.transition = 'all 0.3s cubic-bezier(0.34,1.56,0.64,1)';
-        numEl.style.transform = 'scale(1)';
-      });
-    });
+    // Flash
+    const flash = document.createElement('div');
+    flash.style.cssText = 'position:absolute;inset:0;background:rgba(255,255,255,0.8);z-index:25;opacity:1;transition:opacity 0.3s;';
+    stage.appendChild(flash);
+    t(() => { flash.style.opacity = '0'; }, 100);
 
-    // Clear cracks
-    crackSvg.innerHTML = '';
-    frost.style.opacity = '0';
+    // GO text
+    t(() => {
+      const go = document.createElement('div');
+      go.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.5);font-size:80px;font-weight:900;color:#22c55e;z-index:30;opacity:0;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);';
+      go.textContent = 'GO';
+      stage.appendChild(go);
+      requestAnimationFrame(() => { go.style.transform = 'translate(-50%,-50%) scale(1)'; go.style.opacity = '1'; });
+    }, 80);
 
     haptic(60);
-
-    t(() => {
-      stage.style.transition = 'opacity 0.3s';
-      stage.style.opacity = '0';
-    }, 600);
+    t(() => { stage.style.transition = 'opacity 0.3s'; stage.style.opacity = '0'; }, 700);
   }, 2300);
 }
 
-// ======== 3. WAR DRUMS ========
-function concept3(stage) {
-  stage.style.background = '#fff';
+// ======== 2. STAMPEDE ========
+function stampede(stage) {
+  stage.style.background = 'linear-gradient(180deg, #e8dfd0 0%, #d4c4a8 60%, #c4a872 100%)';
 
   const numEl = document.createElement('div');
-  numEl.style.cssText = 'font-size:150px;font-weight:900;color:#7c5cfc;z-index:10;position:relative;opacity:0;';
+  numEl.style.cssText = 'font-size:140px;font-weight:900;color:#7c5cfc;z-index:10;position:relative;opacity:0;text-shadow:0 2px 20px rgba(124,92,252,0.3);';
   stage.appendChild(numEl);
 
   const labelEl = document.createElement('div');
-  labelEl.style.cssText = 'font-size:16px;font-weight:700;color:#999;letter-spacing:3px;text-transform:uppercase;margin-top:8px;z-index:10;opacity:0;';
+  labelEl.style.cssText = 'font-size:14px;font-weight:700;color:#8a7a60;letter-spacing:3px;text-transform:uppercase;margin-top:8px;z-index:10;opacity:0;';
   labelEl.textContent = 'GET READY';
   stage.appendChild(labelEl);
 
-  function drumHit(num, delay, ringCount, intensity) {
+  // Dust layer at bottom
+  const dustLayer = document.createElement('div');
+  dustLayer.style.cssText = 'position:absolute;bottom:0;left:0;width:100%;height:0;background:linear-gradient(0deg, rgba(180,150,100,0.6) 0%, rgba(180,150,100,0.3) 50%, transparent 100%);z-index:4;transition:height 0.5s ease;';
+  stage.appendChild(dustLayer);
+
+  // Animal silhouettes
+  const silhouettes = ['🦬','🐘','🦏','🐃','🫎','🦌','🐎','🦓'];
+
+  function spawnSilhouette(delay, speed, y, size, opacity) {
     t(() => {
-      numEl.textContent = num;
-      numEl.style.opacity = '1';
-      labelEl.style.opacity = '1';
-      numEl.style.transition = 'none';
-      numEl.style.transform = 'scale(0.5)';
-      numEl.style.opacity = '0';
-
+      const s = document.createElement('div');
+      const animal = silhouettes[Math.floor(Math.random()*silhouettes.length)];
+      const fromLeft = Math.random() > 0.5;
+      s.style.cssText = `
+        position:absolute;top:${y}px;${fromLeft?'left:-60px':'right:-60px'};
+        font-size:${size}px;z-index:3;opacity:${opacity};
+        filter:brightness(0) opacity(${opacity});
+        transition:${fromLeft?'left':'right'} ${speed}s linear;
+      `;
+      s.textContent = animal;
+      stage.appendChild(s);
       requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          numEl.style.transition = `all 0.25s cubic-bezier(0.34,1.56,0.64,1)`;
-          numEl.style.transform = 'scale(1)';
-          numEl.style.opacity = '1';
-        });
+        s.style[fromLeft?'left':'right'] = '420px';
       });
+      setTimeout(() => s.remove(), speed * 1000 + 100);
+    }, delay);
+  }
 
-      // Concentric rings
-      for (let r = 0; r < ringCount; r++) {
-        t(() => {
-          const ring = document.createElement('div');
-          ring.style.cssText = `
-            position:absolute;top:50%;left:50%;width:${40+r*10}px;height:${40+r*10}px;
-            border-radius:50%;border:${2+intensity}px solid rgba(124,92,252,${0.5-r*0.1});
-            transform:translate(-50%,-50%) scale(0.3);opacity:0.8;z-index:5;
-            transition:all ${0.6+r*0.1}s cubic-bezier(0,0,0.2,1);pointer-events:none;
-          `;
-          stage.appendChild(ring);
-          requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-              ring.style.transform = `translate(-50%,-50%) scale(${4+intensity*3})`;
-              ring.style.opacity = '0';
-            });
-          });
-          setTimeout(() => ring.remove(), 1000);
-        }, r * 80);
+  function dustPuff(x, y, count) {
+    for (let i = 0; i < count; i++) {
+      const d = document.createElement('div');
+      const size = 8 + Math.random() * 20;
+      d.style.cssText = `
+        position:absolute;left:${x + (Math.random()-0.5)*60}px;top:${y}px;
+        width:${size}px;height:${size}px;background:rgba(180,150,100,${0.2+Math.random()*0.3});
+        border-radius:50%;z-index:6;opacity:1;
+        transition:all ${0.4+Math.random()*0.4}s ease-out;
+      `;
+      stage.appendChild(d);
+      requestAnimationFrame(() => {
+        d.style.transform = `translate(${(Math.random()-0.5)*40}px, ${-30-Math.random()*50}px)`;
+        d.style.opacity = '0';
+      });
+      setTimeout(() => d.remove(), 800);
+    }
+  }
+
+  // 3 — distant tremor
+  t(() => {
+    numEl.textContent = '3'; numEl.style.opacity = '1'; labelEl.style.opacity = '1';
+    numEl.style.transition = 'none'; numEl.style.transform = 'scale(1.3)';
+    requestAnimationFrame(() => { numEl.style.transition = 'all 0.4s cubic-bezier(0.34,1.56,0.64,1)'; numEl.style.transform = 'scale(1)'; });
+    dustLayer.style.height = '60px';
+    const shk = 2;
+    stage.style.transform = `translateY(${shk}px)`;
+    t(() => { stage.style.transform = ''; }, 80);
+    haptic(10);
+    dustPuff(190, 650, 4);
+  }, 100);
+
+  spawnSilhouette(200, 1.5, 580, 28, 0.15);
+  spawnSilhouette(400, 1.2, 560, 32, 0.2);
+
+  // 2 — getting closer
+  t(() => {
+    numEl.textContent = '2';
+    numEl.style.transition = 'none'; numEl.style.transform = 'scale(1.4)';
+    requestAnimationFrame(() => { numEl.style.transition = 'all 0.4s cubic-bezier(0.34,1.56,0.64,1)'; numEl.style.transform = 'scale(1)'; });
+    dustLayer.style.height = '140px';
+    const shk = 5;
+    stage.style.transform = `translateY(${shk}px)`;
+    t(() => { stage.style.transform = ''; }, 100);
+    haptic(20);
+    dustPuff(120, 620, 6);
+    dustPuff(260, 630, 6);
+  }, 900);
+
+  spawnSilhouette(950, 0.9, 540, 36, 0.25);
+  spawnSilhouette(1050, 0.8, 520, 40, 0.3);
+  spawnSilhouette(1150, 1.0, 550, 34, 0.22);
+
+  // 1 — full stampede
+  t(() => {
+    numEl.textContent = '1';
+    numEl.style.transition = 'none'; numEl.style.transform = 'scale(1.6)';
+    requestAnimationFrame(() => { numEl.style.transition = 'all 0.4s cubic-bezier(0.34,1.56,0.64,1)'; numEl.style.transform = 'scale(1)'; });
+    dustLayer.style.height = '250px';
+    haptic(35);
+    dustPuff(100, 600, 8);
+    dustPuff(200, 590, 8);
+    dustPuff(300, 610, 8);
+
+    // Constant rumble
+    let rc = 0;
+    const rumble = setInterval(() => {
+      rc++;
+      const v = 3 + Math.random() * 5;
+      stage.style.transform = `translate(${(Math.random()-0.5)*v}px, ${Math.random()*v*0.5}px)`;
+      if (rc > 20) { clearInterval(rumble); stage.style.transform = ''; }
+    }, 30);
+    intervals.push(rumble);
+  }, 1600);
+
+  // Rapid silhouettes during 1
+  for (let i = 0; i < 6; i++) {
+    spawnSilhouette(1650 + i*60, 0.5, 480 + Math.random()*80, 42+Math.random()*20, 0.3+Math.random()*0.15);
+  }
+
+  // GO — burst through
+  t(() => {
+    numEl.style.opacity = '0'; labelEl.style.opacity = '0';
+    dustLayer.style.height = '720px';
+    dustLayer.style.background = 'linear-gradient(0deg, rgba(180,150,100,0.8) 0%, rgba(180,150,100,0.4) 60%, transparent 100%)';
+
+    // Big silhouettes charging through
+    for (let i = 0; i < 4; i++) {
+      const s = document.createElement('div');
+      s.style.cssText = `
+        position:absolute;top:${300+i*40}px;left:${-80+i*30}px;
+        font-size:${60+i*10}px;z-index:${15+i};opacity:0.5;
+        filter:brightness(0) opacity(0.4);
+        transition:all 0.35s ease-in;
+      `;
+      s.textContent = silhouettes[i];
+      stage.appendChild(s);
+      t(() => { s.style.left = '440px'; s.style.opacity = '0'; }, i * 50);
+    }
+
+    // Flash
+    const flash = document.createElement('div');
+    flash.style.cssText = 'position:absolute;inset:0;background:rgba(255,255,255,0.7);z-index:25;opacity:1;transition:opacity 0.35s;';
+    stage.appendChild(flash);
+    t(() => { flash.style.opacity = '0'; }, 120);
+
+    const go = document.createElement('div');
+    go.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.3);font-size:80px;font-weight:900;color:#22c55e;z-index:30;opacity:0;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);';
+    go.textContent = 'GO';
+    stage.appendChild(go);
+    t(() => { go.style.transform = 'translate(-50%,-50%) scale(1)'; go.style.opacity = '1'; }, 50);
+
+    haptic(60);
+    t(() => { stage.style.transition = 'opacity 0.3s'; stage.style.opacity = '0'; }, 700);
+  }, 2300);
+}
+
+// ======== 3. PREDATOR EYES ========
+function eyes(stage) {
+  stage.style.background = '#0a0f0a';
+  stage.style.transition = 'background 0.5s';
+
+  // Foliage shadows
+  const foliage = document.createElement('div');
+  foliage.style.cssText = `position:absolute;inset:0;z-index:2;pointer-events:none;opacity:0.3;
+    background:radial-gradient(ellipse at 20% 30%, rgba(20,60,20,0.4) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 70%, rgba(20,60,20,0.3) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 90%, rgba(20,60,20,0.5) 0%, transparent 40%);`;
+  stage.appendChild(foliage);
+
+  const numEl = document.createElement('div');
+  numEl.style.cssText = 'font-size:120px;font-weight:900;color:rgba(124,92,252,0.8);z-index:10;position:relative;opacity:0;text-shadow:0 0 40px rgba(124,92,252,0.4);';
+  stage.appendChild(numEl);
+
+  const labelEl = document.createElement('div');
+  labelEl.style.cssText = 'font-size:14px;font-weight:700;color:rgba(150,180,150,0.5);letter-spacing:3px;text-transform:uppercase;margin-top:8px;z-index:10;opacity:0;';
+  labelEl.textContent = 'GET READY';
+  stage.appendChild(labelEl);
+
+  function spawnEyes(x, y, size, delay, color, blinkDelay) {
+    t(() => {
+      const eyePair = document.createElement('div');
+      eyePair.style.cssText = `position:absolute;left:${x}px;top:${y}px;z-index:5;display:flex;gap:${size*0.8}px;opacity:0;transition:opacity 0.3s;`;
+
+      for (let i = 0; i < 2; i++) {
+        const eye = document.createElement('div');
+        eye.style.cssText = `
+          width:${size}px;height:${size*0.55}px;background:${color};
+          border-radius:50%;position:relative;
+          box-shadow:0 0 ${size}px ${size*0.3}px ${color.replace('1)','0.3)')};
+        `;
+        // Pupil
+        const pupil = document.createElement('div');
+        pupil.style.cssText = `
+          position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+          width:${size*0.35}px;height:${size*0.7}px;background:#000;
+          border-radius:50%;
+        `;
+        eye.appendChild(pupil);
+        eyePair.appendChild(eye);
       }
 
-      // Screen darkens progressively
-      const darkness = intensity * 0.12;
-      stage.style.background = `rgb(${Math.floor(255-darkness*255)}, ${Math.floor(255-darkness*255)}, ${Math.floor(255-darkness*200)})`;
+      stage.appendChild(eyePair);
+      requestAnimationFrame(() => { eyePair.style.opacity = '1'; });
 
-      // Heavy thud shake
-      const shk = 3 + intensity * 12;
-      stage.style.transform = `translate(0, ${shk}px)`;
-      t(() => {
-        stage.style.transition = 'transform 0.2s cubic-bezier(0.34,1.56,0.64,1)';
-        stage.style.transform = '';
-        t(() => { stage.style.transition = ''; }, 200);
-      }, 50);
-
-      haptic(Math.floor(10 + intensity * 40));
-
-      // Sub-hits on higher intensity
-      if (intensity > 0.5) {
+      // Blink
+      if (blinkDelay) {
         t(() => {
-          const shk2 = intensity * 4;
-          stage.style.transform = `translate(${(Math.random()-0.5)*shk2}px, ${shk2*0.5}px)`;
-          t(() => { stage.style.transform = ''; }, 80);
-        }, 250);
+          eyePair.style.transition = 'opacity 0.08s';
+          eyePair.style.opacity = '0.1';
+          t(() => { eyePair.style.opacity = '1'; }, 100);
+        }, blinkDelay);
       }
     }, delay);
   }
 
-  drumHit('3', 100, 1, 0.2);
-  drumHit('2', 900, 2, 0.5);
-  drumHit('1', 1600, 3, 1.0);
+  // 3 — distant eyes appear
+  t(() => {
+    numEl.textContent = '3'; numEl.style.opacity = '1'; labelEl.style.opacity = '1';
+    numEl.style.transition = 'none'; numEl.style.transform = 'scale(1.5)'; numEl.style.opacity = '0';
+    requestAnimationFrame(() => { numEl.style.transition = 'all 0.4s cubic-bezier(0.34,1.56,0.64,1)'; numEl.style.transform = 'scale(1)'; numEl.style.opacity = '1'; });
+    haptic(8);
+  }, 100);
+  spawnEyes(260, 180, 10, 200, 'rgba(200,180,50,1)', 500);
+  spawnEyes(60, 450, 8, 400, 'rgba(180,200,60,1)', 600);
 
-  // GO — massive ring explosion
+  // 2 — closer, bigger, more
+  t(() => {
+    numEl.textContent = '2';
+    numEl.style.transition = 'none'; numEl.style.transform = 'scale(1.5)'; numEl.style.opacity = '0';
+    requestAnimationFrame(() => { numEl.style.transition = 'all 0.4s cubic-bezier(0.34,1.56,0.64,1)'; numEl.style.transform = 'scale(1)'; numEl.style.opacity = '1'; });
+    stage.style.background = '#060a06';
+    haptic(15);
+  }, 900);
+  spawnEyes(100, 250, 14, 950, 'rgba(220,180,40,1)', 400);
+  spawnEyes(280, 400, 12, 1050, 'rgba(200,60,30,1)', 300);
+  spawnEyes(40, 330, 10, 1100, 'rgba(180,200,50,1)', null);
+
+  // 1 — they're everywhere, the main pair is HUGE and close
+  t(() => {
+    numEl.textContent = '1';
+    numEl.style.transition = 'none'; numEl.style.transform = 'scale(1.5)'; numEl.style.opacity = '0';
+    numEl.style.color = 'rgba(200,50,50,0.9)';
+    numEl.style.textShadow = '0 0 60px rgba(200,50,50,0.5)';
+    requestAnimationFrame(() => { numEl.style.transition = 'all 0.4s cubic-bezier(0.34,1.56,0.64,1)'; numEl.style.transform = 'scale(1)'; numEl.style.opacity = '1'; });
+    stage.style.background = '#030503';
+    haptic(30);
+
+    // Tension shake
+    let vc = 0;
+    const vib = setInterval(() => {
+      vc++;
+      stage.style.transform = `translate(${(Math.random()-0.5)*3}px, ${(Math.random()-0.5)*2}px)`;
+      if (vc > 18) { clearInterval(vib); stage.style.transform = ''; }
+    }, 30);
+    intervals.push(vib);
+  }, 1600);
+
+  // Big predator eyes in center
+  spawnEyes(130, 310, 24, 1650, 'rgba(240,180,30,1)', 300);
+  spawnEyes(300, 500, 11, 1700, 'rgba(180,220,50,1)', null);
+  spawnEyes(20, 160, 9, 1750, 'rgba(200,60,40,1)', null);
+
+  // GO — eyes LUNGE
+  t(() => {
+    numEl.style.opacity = '0'; labelEl.style.opacity = '0';
+
+    // All eyes rapidly grow and fade (lunge forward)
+    document.querySelectorAll('#stage > div').forEach(el => {
+      if (el.style.display === 'flex') {
+        el.style.transition = 'all 0.25s ease-in';
+        el.style.transform = 'scale(3)';
+        el.style.opacity = '0';
+      }
+    });
+
+    // White flash (dawn breaks)
+    const flash = document.createElement('div');
+    flash.style.cssText = 'position:absolute;inset:0;background:rgba(255,255,255,0.9);z-index:25;opacity:0;transition:opacity 0.15s;';
+    stage.appendChild(flash);
+    t(() => { flash.style.opacity = '1'; }, 50);
+
+    const go = document.createElement('div');
+    go.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(3);font-size:80px;font-weight:900;color:#22c55e;z-index:30;opacity:0;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);';
+    go.textContent = 'GO';
+    stage.appendChild(go);
+    t(() => { go.style.transform = 'translate(-50%,-50%) scale(1)'; go.style.opacity = '1'; }, 100);
+
+    haptic(60);
+    t(() => { stage.style.transition = 'opacity 0.3s'; stage.style.opacity = '0'; }, 700);
+  }, 2300);
+}
+
+// ======== 4. HEARTBEAT OF THE WILD ========
+function heartbeatWild(stage) {
+  stage.style.background = '#faf8f4';
+
+  const numEl = document.createElement('div');
+  numEl.style.cssText = 'font-size:140px;font-weight:900;color:#7c5cfc;z-index:10;position:relative;opacity:0;';
+  stage.appendChild(numEl);
+
+  const labelEl = document.createElement('div');
+  labelEl.style.cssText = 'font-size:14px;font-weight:700;color:#999;letter-spacing:3px;text-transform:uppercase;margin-top:8px;z-index:10;opacity:0;';
+  labelEl.textContent = 'GET READY';
+  stage.appendChild(labelEl);
+
+  // Central paw print (static, glows)
+  const pawCenter = document.createElement('div');
+  pawCenter.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:60px;z-index:3;opacity:0.15;filter:grayscale(1);transition:all 0.3s;';
+  pawCenter.textContent = '🐾';
+  stage.appendChild(pawCenter);
+
+  // Tribal/organic ring function
+  function pulseRing(delay, size, color, width, duration) {
+    t(() => {
+      const ring = document.createElement('div');
+      ring.style.cssText = `
+        position:absolute;top:50%;left:50%;width:${size}px;height:${size}px;
+        border-radius:50%;border:${width}px solid ${color};
+        transform:translate(-50%,-50%) scale(0.1);opacity:0.8;z-index:4;
+        transition:all ${duration}s cubic-bezier(0,0,0.2,1);pointer-events:none;
+      `;
+      stage.appendChild(ring);
+      requestAnimationFrame(() => {
+        ring.style.transform = 'translate(-50%,-50%) scale(1)';
+        ring.style.opacity = '0';
+      });
+      setTimeout(() => ring.remove(), duration * 1000 + 100);
+    }, delay);
+  }
+
+  function beat(num, delay, intensity, pawColor) {
+    t(() => {
+      numEl.textContent = num; numEl.style.opacity = '1'; labelEl.style.opacity = '1';
+      numEl.style.transition = 'none';
+      numEl.style.transform = 'scale(1.8)';
+      numEl.style.opacity = '0';
+
+      // Double-beat like a real heartbeat (lub-dub)
+      requestAnimationFrame(() => {
+        numEl.style.transition = 'all 0.15s cubic-bezier(0.34,1.56,0.64,1)';
+        numEl.style.transform = 'scale(1.1)';
+        numEl.style.opacity = '1';
+      });
+      // Second beat (dub)
+      t(() => {
+        numEl.style.transition = 'all 0.12s cubic-bezier(0.34,1.56,0.64,1)';
+        numEl.style.transform = 'scale(0.92)';
+        t(() => {
+          numEl.style.transition = 'all 0.3s ease';
+          numEl.style.transform = 'scale(1)';
+        }, 80);
+      }, 160);
+
+      // Paw glows
+      pawCenter.style.opacity = String(0.15 + intensity * 0.5);
+      pawCenter.style.filter = `grayscale(${1 - intensity}) hue-rotate(${intensity * -30}deg) brightness(${0.8 + intensity * 0.8})`;
+      t(() => { pawCenter.style.opacity = String(0.1 + intensity * 0.2); }, 300);
+
+      // Shake — thump downward like a heartbeat
+      const shk = 3 + intensity * 10;
+      stage.style.transform = `translateY(${shk}px)`;
+      stage.style.transition = 'transform 0.08s ease-in';
+      t(() => {
+        stage.style.transition = 'transform 0.25s cubic-bezier(0.34,1.56,0.64,1)';
+        stage.style.transform = '';
+      }, 80);
+
+      // Background warms
+      const warmth = Math.floor(intensity * 15);
+      stage.style.background = `rgb(${250+warmth*0.3}, ${248-warmth}, ${244-warmth*2})`;
+
+      haptic(Math.floor(10 + intensity * 40));
+    }, delay);
+  }
+
+  // 3 — calm beat
+  beat('3', 100, 0.2, '#c4956a');
+  pulseRing(100, 200, 'rgba(196,149,106,0.3)', 2, 0.7);
+
+  // 2 — faster, stronger
+  beat('2', 900, 0.55, '#c47a4a');
+  pulseRing(900, 200, 'rgba(196,122,74,0.4)', 3, 0.6);
+  pulseRing(950, 260, 'rgba(196,122,74,0.2)', 2, 0.7);
+
+  // 1 — pounding
+  beat('1', 1600, 1.0, '#c45a30');
+  pulseRing(1600, 200, 'rgba(200,80,40,0.5)', 4, 0.5);
+  pulseRing(1650, 280, 'rgba(200,80,40,0.35)', 3, 0.6);
+  pulseRing(1700, 360, 'rgba(200,80,40,0.2)', 2, 0.7);
+
+  // Rapid double-beats during 1
+  t(() => {
+    let rc = 0;
+    const rapid = setInterval(() => {
+      rc++;
+      const v = 2 + rc * 0.5;
+      stage.style.transform = `translate(${(Math.random()-0.5)*v}px, ${Math.random()*v}px)`;
+      if (rc > 15) { clearInterval(rapid); stage.style.transform = ''; }
+    }, 35);
+    intervals.push(rapid);
+  }, 1800);
+
+  // GO — the heart ROARS
   t(() => {
     numEl.textContent = 'GO';
     numEl.style.fontSize = '80px';
@@ -483,29 +663,21 @@ function concept3(stage) {
     numEl.style.transition = 'none';
     numEl.style.transform = 'scale(0.3)';
     numEl.style.opacity = '0';
+    labelEl.style.opacity = '0';
 
-    // 6 rapid rings
-    for (let r = 0; r < 6; r++) {
-      t(() => {
-        const ring = document.createElement('div');
-        const colors = ['rgba(124,92,252,0.5)','rgba(34,197,94,0.4)','rgba(245,158,11,0.3)','rgba(236,72,153,0.3)','rgba(6,182,212,0.3)','rgba(124,92,252,0.2)'];
-        ring.style.cssText = `
-          position:absolute;top:50%;left:50%;width:30px;height:30px;
-          border-radius:50%;border:3px solid ${colors[r]};
-          transform:translate(-50%,-50%) scale(0.1);opacity:0.9;z-index:5;
-          transition:all 0.7s cubic-bezier(0,0,0.2,1);pointer-events:none;
-        `;
-        stage.appendChild(ring);
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            ring.style.transform = `translate(-50%,-50%) scale(${12+r*2})`;
-            ring.style.opacity = '0';
-          });
-        });
-      }, r * 40);
+    pawCenter.style.opacity = '0.7';
+    pawCenter.style.filter = 'none';
+    pawCenter.style.transform = 'translate(-50%,-50%) scale(1.5)';
+
+    // Burst rings
+    for (let i = 0; i < 5; i++) {
+      pulseRing(2300 + i * 30, 100 + i * 40, `rgba(34,197,94,${0.5-i*0.08})`, 3, 0.6);
     }
 
-    stage.style.background = '#fff';
+    const flash = document.createElement('div');
+    flash.style.cssText = 'position:absolute;inset:0;background:rgba(34,197,94,0.2);z-index:20;opacity:1;transition:opacity 0.3s;';
+    stage.appendChild(flash);
+    t(() => { flash.style.opacity = '0'; }, 100);
 
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
@@ -516,150 +688,13 @@ function concept3(stage) {
     });
 
     haptic(60);
-    t(() => { stage.style.transition = 'opacity 0.3s'; stage.style.opacity = '0'; }, 600);
+    stage.style.background = '#faf8f4';
+    t(() => { stage.style.transition = 'opacity 0.3s'; stage.style.opacity = '0'; }, 700);
   }, 2300);
 }
 
-// ======== 4. LOCKDOWN PROTOCOL ========
-function concept4(stage) {
-  stage.style.background = '#0a0a0a';
-
-  // Scanlines
-  const scanlines = document.createElement('div');
-  scanlines.style.cssText = `position:absolute;inset:0;z-index:3;pointer-events:none;opacity:0.15;
-    background:repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,0,0.03) 2px, rgba(0,255,0,0.03) 4px);`;
-  stage.appendChild(scanlines);
-
-  // Crosshair
-  const crosshair = document.createElement('div');
-  crosshair.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:6;pointer-events:none;';
-  crosshair.innerHTML = `
-    <div style="width:120px;height:120px;position:relative;transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);">
-      <div style="position:absolute;top:0;left:50%;width:2px;height:20px;background:#22c55e;transform:translateX(-50%);"></div>
-      <div style="position:absolute;bottom:0;left:50%;width:2px;height:20px;background:#22c55e;transform:translateX(-50%);"></div>
-      <div style="position:absolute;left:0;top:50%;width:20px;height:2px;background:#22c55e;transform:translateY(-50%);"></div>
-      <div style="position:absolute;right:0;top:50%;width:20px;height:2px;background:#22c55e;transform:translateY(-50%);"></div>
-      <div style="position:absolute;top:0;left:0;width:16px;height:16px;border-top:2px solid #22c55e;border-left:2px solid #22c55e;"></div>
-      <div style="position:absolute;top:0;right:0;width:16px;height:16px;border-top:2px solid #22c55e;border-right:2px solid #22c55e;"></div>
-      <div style="position:absolute;bottom:0;left:0;width:16px;height:16px;border-bottom:2px solid #22c55e;border-left:2px solid #22c55e;"></div>
-      <div style="position:absolute;bottom:0;right:0;width:16px;height:16px;border-bottom:2px solid #22c55e;border-right:2px solid #22c55e;"></div>
-    </div>
-  `;
-  stage.appendChild(crosshair);
-
-  // Status text
-  const status = document.createElement('div');
-  status.style.cssText = 'position:absolute;top:25%;left:50%;transform:translateX(-50%);font-size:12px;font-weight:700;color:#22c55e;letter-spacing:4px;z-index:10;font-family:monospace;opacity:0;white-space:nowrap;';
-  stage.appendChild(status);
-
-  // Number
-  const numEl = document.createElement('div');
-  numEl.style.cssText = 'font-size:140px;font-weight:900;color:#22c55e;z-index:10;position:relative;opacity:0;font-family:monospace;text-shadow:0 0 40px rgba(34,197,94,0.5);';
-  stage.appendChild(numEl);
-
-  // Data noise
-  const noise = document.createElement('div');
-  noise.style.cssText = 'position:absolute;bottom:15%;left:50%;transform:translateX(-50%);font-size:10px;color:rgba(34,197,94,0.3);font-family:monospace;z-index:6;text-align:center;white-space:pre;line-height:1.4;';
-  stage.appendChild(noise);
-
-  function lockStep(num, delay, statusText, crosshairSize) {
-    t(() => {
-      // Glitch flash
-      stage.style.background = '#1a1a1a';
-      t(() => { stage.style.background = '#0a0a0a'; }, 50);
-      t(() => { stage.style.background = '#0d1a0d'; }, 80);
-      t(() => { stage.style.background = '#0a0a0a'; }, 130);
-
-      numEl.textContent = num;
-      numEl.style.opacity = '1';
-      numEl.style.transition = 'none';
-      numEl.style.transform = 'scale(1.5) skewX(-10deg)';
-
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          numEl.style.transition = 'all 0.3s cubic-bezier(0.34,1.56,0.64,1)';
-          numEl.style.transform = 'scale(1) skewX(0deg)';
-        });
-      });
-
-      status.textContent = statusText;
-      status.style.opacity = '1';
-
-      // Crosshair tightens
-      const ch = crosshair.firstElementChild;
-      ch.style.width = crosshairSize + 'px';
-      ch.style.height = crosshairSize + 'px';
-
-      // Random data noise
-      let noiseText = '';
-      for (let i = 0; i < 4; i++) {
-        noiseText += Array.from({length:28}, () => '0123456789ABCDEF'[Math.floor(Math.random()*16)]).join('') + '\n';
-      }
-      noise.textContent = noiseText;
-
-      // Shake
-      const shk = num === '1' ? 10 : 4;
-      stage.style.transform = `translate(${(Math.random()-0.5)*shk}px, ${(Math.random()-0.5)*shk}px)`;
-      t(() => { stage.style.transform = ''; }, 100);
-
-      haptic(num === '1' ? 40 : 15);
-
-      // Red alert on 1
-      if (num === '1') {
-        numEl.style.color = '#ef4444';
-        numEl.style.textShadow = '0 0 60px rgba(239,68,68,0.6)';
-        stage.style.background = 'rgba(30,5,5,1)';
-        status.style.color = '#ef4444';
-
-        // Alarm blink
-        let blinks = 0;
-        const blinker = setInterval(() => {
-          blinks++;
-          scanlines.style.opacity = blinks % 2 ? '0.3' : '0.1';
-          if (blinks > 8) clearInterval(blinker);
-        }, 60);
-        intervals.push(blinker);
-      }
-    }, delay);
-  }
-
-  lockStep('3', 100, '◉ INITIALIZING TARGET...', 120);
-  lockStep('2', 900, '◎ LOCKING ON...', 70);
-  lockStep('1', 1600, '⚠ TARGET ACQUIRED', 40);
-
-  // GO — ENGAGE
-  t(() => {
-    numEl.textContent = 'GO';
-    numEl.style.fontSize = '70px';
-    numEl.style.color = '#22c55e';
-    numEl.style.textShadow = '0 0 80px rgba(34,197,94,0.8)';
-    numEl.style.transition = 'none';
-    numEl.style.transform = 'scale(3)';
-    numEl.style.opacity = '0';
-    status.textContent = '▶ ENGAGE';
-    status.style.color = '#22c55e';
-
-    // Wipe effect — green bar sweeps down
-    const wipe = document.createElement('div');
-    wipe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:0;background:rgba(34,197,94,0.3);z-index:20;transition:height 0.3s ease-in;';
-    stage.appendChild(wipe);
-    requestAnimationFrame(() => { wipe.style.height = '100%'; });
-
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        numEl.style.transition = 'all 0.25s cubic-bezier(0.34,1.56,0.64,1)';
-        numEl.style.transform = 'scale(1)';
-        numEl.style.opacity = '1';
-      });
-    });
-
-    haptic(60);
-    t(() => { stage.style.transition = 'opacity 0.3s'; stage.style.opacity = '0'; }, 600);
-  }, 2300);
-}
-
-// ======== 5. VOID RIP ========
-function concept5(stage) {
+// ======== 5. THE POUNCE ========
+function pounce(stage) {
   stage.style.background = '#fff';
 
   const numEl = document.createElement('div');
@@ -667,177 +702,153 @@ function concept5(stage) {
   stage.appendChild(numEl);
 
   const labelEl = document.createElement('div');
-  labelEl.style.cssText = 'font-size:16px;font-weight:700;color:#999;letter-spacing:3px;text-transform:uppercase;margin-top:8px;z-index:10;opacity:0;';
+  labelEl.style.cssText = 'font-size:14px;font-weight:700;color:#999;letter-spacing:3px;text-transform:uppercase;margin-top:8px;z-index:10;opacity:0;';
   labelEl.textContent = 'GET READY';
   stage.appendChild(labelEl);
 
-  // Void tear — using a gradient that simulates a crack in reality
-  const tear = document.createElement('div');
-  tear.style.cssText = `
-    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-    width:0;height:0;z-index:4;pointer-events:none;
-    background:radial-gradient(ellipse, #1a0a2e 0%, rgba(124,92,252,0.4) 40%, transparent 70%);
-    border-radius:50%;transition:all 0.5s cubic-bezier(0.34,1.56,0.64,1);
-    box-shadow:0 0 0 0 rgba(124,92,252,0);
-  `;
-  stage.appendChild(tear);
+  // Energy lines (coiled spring feel)
+  const springContainer = document.createElement('div');
+  springContainer.style.cssText = 'position:absolute;inset:0;z-index:3;pointer-events:none;overflow:hidden;';
+  stage.appendChild(springContainer);
 
-  // Energy particles container
-  const particleLayer = document.createElement('div');
-  particleLayer.style.cssText = 'position:absolute;inset:0;z-index:5;pointer-events:none;overflow:hidden;';
-  stage.appendChild(particleLayer);
+  // Motion blur streaks container
+  const streaks = document.createElement('div');
+  streaks.style.cssText = 'position:absolute;inset:0;z-index:15;pointer-events:none;overflow:hidden;opacity:0;';
+  stage.appendChild(streaks);
 
-  // Edge warp overlay
-  const warp = document.createElement('div');
-  warp.style.cssText = 'position:absolute;inset:0;z-index:3;pointer-events:none;opacity:0;transition:opacity 0.3s;';
-  stage.appendChild(warp);
-
-  function spawnParticles(count, inward, intensity) {
-    for (let i = 0; i < count; i++) {
-      const p = document.createElement('div');
-      const angle = Math.random() * Math.PI * 2;
-      const dist = 150 + Math.random() * 200;
-      const startX = 190 + Math.cos(angle) * dist;
-      const startY = 360 + Math.sin(angle) * dist;
-      const size = 2 + Math.random() * 4;
-      const colors = ['#7c5cfc','#a78bfa','#c4b5fd','#818cf8','#6366f1'];
-
-      p.style.cssText = `
-        position:absolute;left:${startX}px;top:${startY}px;
-        width:${size}px;height:${size}px;border-radius:50%;
-        background:${colors[Math.floor(Math.random()*colors.length)]};
-        opacity:0.8;transition:all ${0.4+Math.random()*0.4}s cubic-bezier(0.4,0,0.2,1);
-        box-shadow:0 0 ${size*2}px ${colors[Math.floor(Math.random()*colors.length)]};
-      `;
-      particleLayer.appendChild(p);
-
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          if (inward) {
-            p.style.left = (190 + (Math.random()-0.5)*20) + 'px';
-            p.style.top = (360 + (Math.random()-0.5)*20) + 'px';
-          } else {
-            p.style.left = (startX + Math.cos(angle)*300) + 'px';
-            p.style.top = (startY + Math.sin(angle)*300) + 'px';
-          }
-          p.style.opacity = '0';
-        });
-      });
-
-      setTimeout(() => p.remove(), 800);
-    }
-  }
-
-  function voidStep(num, delay, tearSize, intensity) {
+  function coil(num, delay, crouchAmount, intensity) {
     t(() => {
-      numEl.textContent = num;
-      numEl.style.opacity = '1';
-      labelEl.style.opacity = '1';
+      numEl.textContent = num; numEl.style.opacity = '1'; labelEl.style.opacity = '1';
+
+      // Number DROPS from above and squashes on landing
       numEl.style.transition = 'none';
-      numEl.style.transform = 'scale(2.5)';
+      numEl.style.transform = `translateY(-100px) scaleY(1.3) scaleX(0.85)`;
       numEl.style.opacity = '0';
 
       requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          numEl.style.transition = 'all 0.4s cubic-bezier(0.34,1.56,0.64,1)';
-          numEl.style.transform = 'scale(1)';
-          numEl.style.opacity = '1';
-        });
+        numEl.style.transition = 'transform 0.2s cubic-bezier(0.6, 0, 1, 1), opacity 0.1s';
+        numEl.style.transform = `translateY(${crouchAmount}px) scaleY(${0.7 - intensity*0.1}) scaleX(${1.15 + intensity*0.1})`;
+        numEl.style.opacity = '1';
+
+        // Bounce back but stay crouched
+        t(() => {
+          numEl.style.transition = 'transform 0.4s cubic-bezier(0.34,1.56,0.64,1)';
+          numEl.style.transform = `translateY(${crouchAmount * 0.6}px) scaleY(${0.85 - intensity*0.05}) scaleX(${1.05 + intensity*0.05})`;
+        }, 200);
       });
 
-      // Tear grows
-      tear.style.width = tearSize + 'px';
-      tear.style.height = tearSize + 'px';
-      tear.style.boxShadow = `0 0 ${tearSize}px ${tearSize*0.3}px rgba(124,92,252,${0.1+intensity*0.2})`;
+      // Compression lines (spring energy)
+      for (let i = 0; i < Math.floor(2 + intensity * 4); i++) {
+        const line = document.createElement('div');
+        const y = 400 + crouchAmount + (i * 15);
+        line.style.cssText = `
+          position:absolute;left:${100 + Math.random()*180}px;top:${y}px;
+          width:${40 + Math.random()*60}px;height:2px;
+          background:rgba(124,92,252,${0.1 + intensity*0.15});
+          border-radius:1px;z-index:4;opacity:0;
+          transition:all 0.3s ease;
+        `;
+        springContainer.appendChild(line);
+        requestAnimationFrame(() => { line.style.opacity = '1'; });
+        t(() => { line.style.opacity = '0'; }, 400);
+        setTimeout(() => line.remove(), 700);
+      }
 
-      // Particles get sucked in
-      spawnParticles(Math.floor(5 + intensity * 15), true, intensity);
+      // Ground impact shadow
+      const shadow = document.createElement('div');
+      shadow.style.cssText = `
+        position:absolute;top:${420+crouchAmount}px;left:50%;
+        width:${60 + intensity*80}px;height:${8 + intensity*6}px;
+        background:rgba(0,0,0,${0.05+intensity*0.08});
+        border-radius:50%;transform:translateX(-50%);z-index:2;
+        transition:all 0.3s ease;
+      `;
+      stage.appendChild(shadow);
+      t(() => { shadow.style.opacity = '0'; }, 500);
+      setTimeout(() => shadow.remove(), 800);
 
-      // Background warps — edges darken
-      const vignette = intensity * 0.3;
-      warp.style.opacity = '1';
-      warp.style.background = `radial-gradient(ellipse at center, transparent ${60 - intensity*40}%, rgba(26,10,46,${vignette}) 100%)`;
-
-      // Stage pulls inward slightly
-      const pull = 1 - intensity * 0.02;
-      stage.style.transform = `scale(${pull})`;
-
-      // Shake
-      const shk = intensity * 8;
+      // Shake on landing
+      const shk = 3 + intensity * 8;
+      stage.style.transform = `translateY(${shk * 0.5}px)`;
       t(() => {
-        stage.style.transform = `scale(${pull}) translate(${(Math.random()-0.5)*shk}px, ${(Math.random()-0.5)*shk}px)`;
-        t(() => { stage.style.transform = `scale(${pull})`; }, 100);
-      }, 50);
+        stage.style.transition = 'transform 0.2s cubic-bezier(0.34,1.56,0.64,1)';
+        stage.style.transform = '';
+        t(() => { stage.style.transition = ''; }, 200);
+      }, 60);
 
       haptic(Math.floor(10 + intensity * 35));
 
-      // On 1 — constant particle stream
+      // Vibrate while coiled on 1
       if (num === '1') {
-        let streamCount = 0;
-        const stream = setInterval(() => {
-          streamCount++;
-          spawnParticles(3, true, 1);
-          const v = 2 + Math.random() * 3;
-          stage.style.transform = `scale(0.98) translate(${(Math.random()-0.5)*v}px, ${(Math.random()-0.5)*v}px)`;
-          if (streamCount > 12) clearInterval(stream);
-        }, 50);
-        intervals.push(stream);
+        let vc = 0;
+        const vib = setInterval(() => {
+          vc++;
+          const v = 1 + vc * 0.4;
+          numEl.style.transform = `translateY(${crouchAmount*0.6}px) scaleY(${0.8-vc*0.005}) scaleX(${1.1+vc*0.005}) translate(${(Math.random()-0.5)*v}px, ${(Math.random()-0.5)*v*0.3}px)`;
+          if (vc > 16) clearInterval(vib);
+        }, 30);
+        intervals.push(vib);
       }
     }, delay);
   }
 
-  voidStep('3', 100, 30, 0.2);
-  voidStep('2', 900, 80, 0.5);
-  voidStep('1', 1600, 160, 1.0);
+  // Each count crouches deeper
+  coil('3', 100, 15, 0.2);
+  coil('2', 900, 35, 0.55);
+  coil('1', 1600, 60, 1.0);
 
-  // GO — reality snaps back
+  // GO — LAUNCH upward with massive force
   t(() => {
+    labelEl.style.opacity = '0';
+    // Clear spring lines
+    springContainer.innerHTML = '';
+
     numEl.textContent = 'GO';
     numEl.style.fontSize = '80px';
     numEl.style.color = '#22c55e';
     numEl.style.transition = 'none';
-    numEl.style.transform = 'scale(0.1)';
-    numEl.style.opacity = '0';
-    labelEl.style.opacity = '0';
+    numEl.style.transform = 'translateY(80px) scaleY(0.5) scaleX(1.4)';
 
-    // Void collapses
-    tear.style.transition = 'all 0.3s cubic-bezier(0,0,0.2,1)';
-    tear.style.width = '0px';
-    tear.style.height = '0px';
-    tear.style.boxShadow = '0 0 200px 100px rgba(124,92,252,0.4)';
-
-    // Particles explode OUTWARD
-    spawnParticles(30, false, 1);
-
-    // Shockwave ring
-    const sw = document.createElement('div');
-    sw.style.cssText = 'position:absolute;top:50%;left:50%;width:40px;height:40px;border-radius:50%;border:3px solid rgba(124,92,252,0.6);transform:translate(-50%,-50%) scale(0.1);z-index:15;transition:all 0.6s ease-out;';
-    stage.appendChild(sw);
-    requestAnimationFrame(() => {
-      sw.style.transform = 'translate(-50%,-50%) scale(12)';
-      sw.style.opacity = '0';
-    });
-
-    // Flash
-    const flash = document.createElement('div');
-    flash.style.cssText = 'position:absolute;inset:0;background:rgba(124,92,252,0.3);z-index:20;opacity:1;transition:opacity 0.4s;border-radius:20px;';
-    stage.appendChild(flash);
-    t(() => { flash.style.opacity = '0'; }, 50);
-
-    // Snap back to normal
-    stage.style.transform = 'scale(1)';
-    warp.style.opacity = '0';
+    // Motion blur streaks
+    streaks.style.opacity = '1';
+    for (let i = 0; i < 12; i++) {
+      const streak = document.createElement('div');
+      streak.style.cssText = `
+        position:absolute;left:${80+Math.random()*220}px;top:0;
+        width:${2+Math.random()*3}px;height:100%;
+        background:linear-gradient(180deg, transparent 0%, rgba(124,92,252,${0.1+Math.random()*0.15}) 30%, rgba(34,197,94,${0.1+Math.random()*0.1}) 70%, transparent 100%);
+      `;
+      streaks.appendChild(streak);
+    }
 
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        numEl.style.transition = 'all 0.35s cubic-bezier(0.34,1.56,0.64,1)';
-        numEl.style.transform = 'scale(1)';
-        numEl.style.opacity = '1';
+        // LAUNCH — spring upward
+        numEl.style.transition = 'all 0.25s cubic-bezier(0.34,1.56,0.64,1)';
+        numEl.style.transform = 'translateY(-20px) scaleY(1.1) scaleX(0.95)';
+
+        // Settle
+        t(() => {
+          numEl.style.transition = 'all 0.2s ease';
+          numEl.style.transform = 'translateY(0) scaleY(1) scaleX(1)';
+          streaks.style.transition = 'opacity 0.3s';
+          streaks.style.opacity = '0';
+        }, 250);
       });
     });
 
+    // Upward shockwave
+    const wave = document.createElement('div');
+    wave.style.cssText = `
+      position:absolute;bottom:0;left:0;width:100%;height:10px;
+      background:rgba(34,197,94,0.3);z-index:20;
+      transition:all 0.3s ease-out;
+    `;
+    stage.appendChild(wave);
+    requestAnimationFrame(() => { wave.style.height = '720px'; wave.style.opacity = '0'; });
+
     haptic(60);
-    t(() => { stage.style.transition = 'opacity 0.3s'; stage.style.opacity = '0'; }, 600);
+    t(() => { stage.style.transition = 'opacity 0.3s'; stage.style.opacity = '0'; }, 700);
   }, 2300);
 }
 
