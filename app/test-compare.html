@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html><head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Animation Comparison</title>
+<style>
+body{font-family:sans-serif;margin:0;padding:20px;background:#1a1a2e;color:#fff;}
+h2{font-size:14px;margin:4px 0;}
+.row{display:flex;gap:20px;margin-bottom:20px;}
+.col{flex:1;}
+
+/* ===== PREVIEW STYLES (gold standard) ===== */
+.preview-stage{
+  position:relative;height:380px;overflow:hidden;background:#fafafa;border-radius:12px;
+}
+.particle{position:absolute;pointer-events:none;}
+.confetti-up{animation:cupward ease-out forwards;}
+@keyframes cupward{
+  0%{opacity:1;transform:translate(0,0) rotate(0deg) scale(1)}
+  60%{opacity:1}
+  100%{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(var(--rot)) scale(0.3)}
+}
+.confetti-gravity{animation:cgravity ease-in forwards;}
+@keyframes cgravity{
+  0%{opacity:1;transform:translate(0,0) rotate(0deg)}
+  100%{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(var(--rot))}
+}
+.flash{position:absolute;inset:0;pointer-events:none;opacity:0;z-index:20}
+.flash.go{animation:flashPop 0.35s ease-out forwards}
+@keyframes flashPop{0%{opacity:0.85}100%{opacity:0}}
+.shockwave{position:absolute;border-radius:50%;pointer-events:none;border:3px solid;opacity:0;z-index:15}
+.shockwave.go{animation:swExpand 0.7s ease-out forwards}
+@keyframes swExpand{0%{transform:scale(0.1);opacity:0.8}100%{transform:scale(4);opacity:0}}
+@keyframes shake{0%,100%{transform:translateX(0)}10%{transform:translateX(-8px) rotate(-0.5deg)}20%{transform:translateX(8px) rotate(0.5deg)}30%{transform:translateX(-5px)}40%{transform:translateX(5px)}50%{transform:translateX(-2px)}60%{transform:translateX(2px)}}
+.shaking{animation:shake 0.5s ease-out}
+
+/* ===== REACT STYLES (current deployed) ===== */
+.react-stage{
+  position:relative;height:380px;overflow:hidden;background:#fafafa;border-radius:12px;
+}
+.cr-particle{position:absolute;pointer-events:none;}
+.cr-confetti-up{animation:crUpward ease-out forwards;}
+@keyframes crUpward{
+  0%{opacity:1;transform:translate(0,0) rotate(0deg) scale(1)}
+  60%{opacity:1}
+  100%{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(var(--rot)) scale(0.3)}
+}
+.cr-confetti-gravity{animation:crGravity ease-in forwards;}
+@keyframes crGravity{
+  0%{opacity:1;transform:translate(0,0) rotate(0deg)}
+  100%{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(var(--rot))}
+}
+.cr-flash{position:absolute;inset:0;pointer-events:none;opacity:0;z-index:20}
+.cr-flash-go{animation:crFlashPop 0.35s ease-out forwards}
+@keyframes crFlashPop{0%{opacity:0.85}100%{opacity:0}}
+.cr-shockwave{position:absolute;border-radius:50%;pointer-events:none;border:3px solid;opacity:0;z-index:15;
+  width:60px;height:60px;left:calc(50% - 30px);top:calc(50% - 30px);}
+.cr-sw-go{animation:crSwExpand 0.7s ease-out forwards}
+@keyframes crSwExpand{0%{transform:scale(0.1);opacity:0.8}100%{transform:scale(4);opacity:0}}
+@keyframes crShake{0%,100%{transform:translateX(0)}10%{transform:translateX(-8px) rotate(-0.5deg)}20%{transform:translateX(8px) rotate(0.5deg)}30%{transform:translateX(-5px)}40%{transform:translateX(5px)}50%{transform:translateX(-2px)}60%{transform:translateX(2px)}}
+.cr-shaking{animation:crShake 0.5s ease-out}
+
+button{padding:10px 20px;font-size:14px;cursor:pointer;border:none;border-radius:8px;background:#6C63FF;color:#fff;margin:4px;}
+.label{position:absolute;top:8px;left:8px;font-size:11px;font-weight:700;color:#333;z-index:30;background:rgba(255,255,255,0.8);padding:2px 8px;border-radius:4px;}
+</style>
+</head><body>
+<h1 style="font-size:18px;">Side-by-Side Animation Comparison</h1>
+<div>
+<button onclick="fire('win')">WIN Explosion</button>
+<button onclick="fire('loss')">LOSS Explosion</button>
+<button onclick="fire('draw')">DRAW Explosion</button>
+<button onclick="clearAll()">Clear</button>
+</div>
+<div class="row" style="margin-top:12px;">
+  <div class="col">
+    <h2>PREVIEW (gold standard)</h2>
+    <div class="preview-stage" id="preview"><div class="label">PREVIEW</div></div>
+  </div>
+  <div class="col">
+    <h2>REACT (current deploy)</h2>
+    <div class="react-stage" id="react"><div class="label">REACT</div></div>
+  </div>
+</div>
+
+<script>
+function clearAll(){
+  document.getElementById('preview').innerHTML='<div class="label">PREVIEW</div>';
+  document.getElementById('react').innerHTML='<div class="label">REACT</div>';
+}
+
+const palettes={
+  win:['#22C55E','#6C63FF','#F59E0B','#00D4AA','#fff','#34D399','#A78BFA','#EC4899'],
+  loss:['#EF4444','#991B1B','#7F1D1D','#6B7B94'],
+  draw:['#F59E0B','#FBBF24','#6B7B94','#ddd','#fff']
+};
+
+function fire(type){
+  clearAll();
+  const preview=document.getElementById('preview');
+  const react=document.getElementById('react');
+  
+  // Spawn identical animations on both with their respective class names
+  const count = type==='win'?60:type==='draw'?25:12;
+  
+  // Preview flash
+  if(type==='win'){
+    pFlash(preview,'rgba(255,255,255,0.9)','flash','go');
+    setTimeout(()=>pFlash(preview,'rgba(34,197,94,0.3)','flash','go'),80);
+    pShockwave(preview,'#22C55E','shockwave','go');
+    setTimeout(()=>pShockwave(preview,'#6C63FF','shockwave','go'),120);
+    setTimeout(()=>pShockwave(preview,'#F59E0B','shockwave','go'),220);
+    preview.classList.add('shaking');
+    
+    rFlash(react,'rgba(255,255,255,0.9)');
+    setTimeout(()=>rFlash(react,'rgba(34,197,94,0.3)'),80);
+    rShockwave(react,'#22C55E');
+    setTimeout(()=>rShockwave(react,'#6C63FF'),120);
+    setTimeout(()=>rShockwave(react,'#F59E0B'),220);
+    react.classList.add('cr-shaking');
+  } else if(type==='draw'){
+    pFlash(preview,'rgba(245,158,11,0.25)','flash','go');
+    pShockwave(preview,'#F59E0B','shockwave','go');
+    rFlash(react,'rgba(245,158,11,0.25)');
+    rShockwave(react,'#F59E0B');
+  } else {
+    pFlash(preview,'rgba(239,68,68,0.4)','flash','go');
+    pShockwave(preview,'#EF4444','shockwave','go');
+    preview.classList.add('shaking');
+    rFlash(react,'rgba(239,68,68,0.4)');
+    rShockwave(react,'#EF4444');
+    react.classList.add('cr-shaking');
+  }
+  
+  // Confetti — IDENTICAL random seed approach
+  const colors=palettes[type==='loss'?'loss':type]||palettes.draw;
+  for(let i=0;i<count;i++){
+    const size=4+Math.random()*8;
+    const dx=(Math.random()-0.5)*280;
+    const dy=-(120+Math.random()*220);
+    const rot=Math.random()*900-450;
+    const dur=0.6+Math.random()*0.5;
+    const col=colors[Math.floor(Math.random()*colors.length)];
+    const br=Math.random()>0.4?'1px':'50%';
+    const delay=Math.random()*0.1;
+    
+    // Preview particle
+    const p=document.createElement('div');
+    p.className='particle confetti-up';
+    p.style.cssText=`width:${size}px;height:${size*0.6}px;background:${col};left:50%;top:55%;--dx:${dx}px;--dy:${dy}px;--rot:${rot}deg;animation-duration:${dur}s;animation-delay:${delay}s;border-radius:${br};`;
+    preview.appendChild(p);
+    
+    // React particle
+    const r=document.createElement('div');
+    r.className='cr-particle cr-confetti-up';
+    r.style.cssText=`width:${size}px;height:${size*0.6}px;background:${col};left:50%;top:55%;--dx:${dx}px;--dy:${dy}px;--rot:${rot}deg;animation-duration:${dur}s;animation-delay:${delay}s;border-radius:${br};`;
+    react.appendChild(r);
+    
+    // Gravity wave
+    setTimeout(()=>{
+      const dx2=(Math.random()-0.5)*200;
+      const dy2=150+Math.random()*200;
+      const rot2=Math.random()*360;
+      const dur2=0.8+Math.random()*0.6;
+      const col2=colors[Math.floor(Math.random()*colors.length)];
+      const br2=Math.random()>0.4?'1px':'50%';
+      
+      const pg=document.createElement('div');
+      pg.className='particle confetti-gravity';
+      pg.style.cssText=`width:${size}px;height:${size*0.6}px;background:${col2};left:${30+Math.random()*40}%;top:${10+Math.random()*20}%;--dx:${dx2}px;--dy:${dy2}px;--rot:${rot2}deg;animation-duration:${dur2}s;border-radius:${br2};`;
+      preview.appendChild(pg);
+      
+      const rg=document.createElement('div');
+      rg.className='cr-particle cr-confetti-gravity';
+      rg.style.cssText=`width:${size}px;height:${size*0.6}px;background:${col2};left:${30+Math.random()*40}%;top:${10+Math.random()*20}%;--dx:${dx2}px;--dy:${dy2}px;--rot:${rot2}deg;animation-duration:${dur2}s;border-radius:${br2};`;
+      react.appendChild(rg);
+    },dur*600+Math.random()*200);
+  }
+  
+  setTimeout(()=>{preview.classList.remove('shaking');react.classList.remove('cr-shaking');},600);
+}
+
+function pFlash(stage,color,cls,goCls){
+  const f=document.createElement('div');f.className=cls;f.style.background=color;
+  stage.appendChild(f);requestAnimationFrame(()=>f.classList.add(goCls));
+}
+function pShockwave(stage,color,cls,goCls){
+  const s=document.createElement('div');s.className=cls;
+  s.style.cssText=`width:60px;height:60px;left:calc(50% - 30px);top:calc(50% - 30px);border-color:${color};`;
+  stage.appendChild(s);requestAnimationFrame(()=>s.classList.add(goCls));
+}
+function rFlash(stage,color){
+  const f=document.createElement('div');f.className='cr-flash';f.style.background=color;
+  stage.appendChild(f);requestAnimationFrame(()=>f.classList.add('cr-flash-go'));
+}
+function rShockwave(stage,color){
+  const s=document.createElement('div');s.className='cr-shockwave';
+  s.style.borderColor=color;
+  stage.appendChild(s);requestAnimationFrame(()=>s.classList.add('cr-sw-go'));
+}
+</script>
+</body></html>
