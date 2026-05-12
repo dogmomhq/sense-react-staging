@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SENSE — Reveal Concepts</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: #f0f0f3;
+  color: #1A1A2E;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Design system tokens */
+:root {
+  --bg: #f0f0f3;
+  --card: rgba(255,255,255,0.85);
+  --accent: #6C63FF;
+  --accent-dark: #5A52E0;
+  --win: #22C55E;
+  --lose: #EF4444;
+  --draw: #F59E0B;
+  --text: #1A1A2E;
+  --text2: #6B7B94;
+  --border: rgba(0,0,0,0.06);
+  --radius: 16px;
+}
+
+.page-header {
+  text-align: center; padding: 20px 16px 10px;
+  font-size: 13px; color: var(--text2); font-weight: 600;
+  letter-spacing: 2px; text-transform: uppercase;
+}
+
+.concept {
+  margin: 12px 16px 28px; background: var(--card);
+  border-radius: var(--radius); border: 1px solid var(--border);
+  backdrop-filter: blur(8px); overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+}
+.concept-header {
+  padding: 14px 16px 10px; border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.concept-title { font-size: 15px; font-weight: 700; }
+.concept-num { font-size: 11px; color: var(--text2); font-weight: 600; letter-spacing: 1px; }
+
+.concept-stage {
+  position: relative; height: 360px; overflow: hidden;
+  background: #fafafa;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.concept-controls {
+  display: flex; gap: 8px; padding: 12px 16px;
+  border-top: 1px solid var(--border);
+}
+.btn-win, .btn-lose {
+  flex: 1; padding: 12px; border: none; border-radius: 12px;
+  font-weight: 700; font-size: 14px; cursor: pointer;
+  font-family: 'Inter', sans-serif; letter-spacing: 1px;
+  transition: transform 0.1s;
+}
+.btn-win:active, .btn-lose:active { transform: scale(0.96); }
+.btn-win { background: var(--win); color: #fff; }
+.btn-lose { background: var(--lose); color: #fff; }
+.btn-reset {
+  width: 44px; background: var(--bg); border: 1px solid var(--border);
+  border-radius: 12px; cursor: pointer; font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* Shared reveal elements */
+.reveal-idle { color: var(--text2); font-size: 14px; font-weight: 500; letter-spacing: 1px; }
+
+.result-banner { font-size: 28px; font-weight: 900; letter-spacing: 2px; text-align: center; }
+.result-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 12px 16px; margin: 12px 16px;
+  text-align: left; width: calc(100% - 32px);
+}
+.result-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; }
+.result-label { font-size: 11px; font-weight: 700; color: var(--text2); letter-spacing: 1px; }
+.result-answer { font-size: 14px; font-weight: 600; }
+.result-time { font-size: 13px; color: var(--text2); font-weight: 500; }
+.result-divider { height: 1px; background: var(--border); margin: 4px 0; }
+.result-payout { font-size: 36px; font-weight: 900; text-align: center; margin: 8px 0 4px; }
+.result-payout-label { font-size: 12px; color: var(--text2); text-align: center; font-weight: 500; }
+
+/* Confetti particle */
+.particle {
+  position: absolute; border-radius: 2px; pointer-events: none;
+  animation: particleFall linear forwards;
+}
+@keyframes particleFall {
+  0% { opacity: 1; transform: translate(0,0) rotate(0deg) scale(1); }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(var(--rot)) scale(0.3); }
+}
+
+/* Screen shake */
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  10% { transform: translateX(-8px) rotate(-0.5deg); }
+  20% { transform: translateX(8px) rotate(0.5deg); }
+  30% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  50% { transform: translateX(-3px); }
+  60% { transform: translateX(3px); }
+  70% { transform: translateX(-1px); }
+}
+.shaking { animation: shake 0.6s ease-out; }
+
+/* Flash overlay */
+.flash {
+  position: absolute; inset: 0; pointer-events: none; opacity: 0;
+  z-index: 20;
+}
+.flash.go { animation: flashPop 0.4s ease-out forwards; }
+@keyframes flashPop {
+  0% { opacity: 0.7; }
+  100% { opacity: 0; }
+}
+
+/* Shockwave ring */
+.shockwave {
+  position: absolute; border-radius: 50%; pointer-events: none;
+  border: 3px solid; opacity: 0; z-index: 15;
+}
+.shockwave.go {
+  animation: shockwaveExpand 0.8s ease-out forwards;
+}
+@keyframes shockwaveExpand {
+  0% { transform: scale(0.1); opacity: 0.8; }
+  100% { transform: scale(4); opacity: 0; }
+}
+</style>
+</head>
+<body>
+
+<div class="page-header">SENSE — REVEAL CONCEPTS 1-5</div>
+
+<div id="concepts"></div>
+
+<script>
+// Game data
+const GAME_DATA = {
+  win: {
+    myAnswer: 'Red Fox', myCorrect: true, myTime: 2.31,
+    oppAnswer: 'Red Fox', oppCorrect: true, oppTime: 3.14,
+    correctAnswer: 'Red Fox', opponent: 'PLAYER_42',
+    payout: '2.00', wager: '1.00', banner: "LET'S GO"
+  },
+  lose: {
+    myAnswer: 'Arctic Fox', myCorrect: false, myTime: 4.12,
+    oppAnswer: 'Red Fox', oppCorrect: true, oppTime: 2.87,
+    correctAnswer: 'Red Fox', opponent: 'PLAYER_42',
+    payout: '0', wager: '1.00', banner: "NEXT ONE'S YOURS"
+  }
+};
+
+const concepts = [
+  { num: 1, title: 'THE HEARTBEAT', build: buildHeartbeat },
+  { num: 2, title: 'THE ENERGY ORB', build: buildEnergyOrb },
+  { num: 3, title: 'THE CRACK', build: buildCrack },
+  { num: 4, title: 'THE COUNTDOWN RACE', build: buildCountdownRace },
+  { num: 5, title: 'THE LIGHTNING STORM', build: buildLightningStorm },
+];
+
+// Render concept cards
+const container = document.getElementById('concepts');
+concepts.forEach(c => {
+  const div = document.createElement('div');
+  div.className = 'concept';
+  div.innerHTML = `
+    <div class="concept-header">
+      <span class="concept-title">${c.title}</span>
+      <span class="concept-num">#${c.num}</span>
+    </div>
+    <div class="concept-stage" id="stage-${c.num}">
+      <span class="reveal-idle">TAP WIN OR LOSE</span>
+    </div>
+    <div class="concept-controls">
+      <button class="btn-win" onclick="runConcept(${c.num},'win')">WIN</button>
+      <button class="btn-lose" onclick="runConcept(${c.num},'lose')">LOSE</button>
+      <button class="btn-reset" onclick="resetConcept(${c.num})">↺</button>
+    </div>
+  `;
+  container.appendChild(div);
+});
+
+function runConcept(num, result) {
+  const stage = document.getElementById(`stage-${num}`);
+  stage.innerHTML = '';
+  const data = GAME_DATA[result];
+  concepts[num-1].build(stage, data, result);
+}
+
+function resetConcept(num) {
+  const stage = document.getElementById(`stage-${num}`);
+  stage.innerHTML = '<span class="reveal-idle">TAP WIN OR LOSE</span>';
+  stage.className = 'concept-stage';
+}
+
+// Helper: spawn confetti
+function spawnConfetti(stage, count, color) {
+  const colors = color === 'win'
+    ? ['#22C55E','#6C63FF','#F59E0B','#00D4AA','#fff','#34D399']
+    : ['#EF4444','#991B1B','#6B7B94','#ddd'];
+  for (let i = 0; i < count; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = 4 + Math.random() * 6;
+    const dx = (Math.random() - 0.5) * 300;
+    const dy = -(80 + Math.random() * 250);
+    const rot = Math.random() * 720 - 360;
+    p.style.cssText = `
+      width:${size}px; height:${size}px;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      left:50%; top:50%;
+      --dx:${dx}px; --dy:${dy}px; --rot:${rot}deg;
+      animation-duration:${0.8+Math.random()*0.6}s;
+      animation-delay:${Math.random()*0.2}s;
+      border-radius:${Math.random()>0.5?'50%':'2px'};
+    `;
+    stage.appendChild(p);
+  }
+}
+
+// Helper: flash
+function flashScreen(stage, color) {
+  const f = document.createElement('div');
+  f.className = 'flash';
+  f.style.background = color;
+  stage.appendChild(f);
+  requestAnimationFrame(() => f.classList.add('go'));
+}
+
+// Helper: shockwave
+function shockwave(stage, color) {
+  const s = document.createElement('div');
+  s.className = 'shockwave';
+  s.style.cssText = `width:60px;height:60px;left:calc(50% - 30px);top:calc(50% - 30px);border-color:${color};`;
+  stage.appendChild(s);
+  requestAnimationFrame(() => s.classList.add('go'));
+}
+
+// Helper: details card
+function showDetails(stage, data, result, delay) {
+  setTimeout(() => {
+    const color = result === 'win' ? 'var(--win)' : 'var(--lose)';
+    const payText = result === 'win' ? `+$${data.payout}` : `-$${data.wager}`;
+    const card = document.createElement('div');
+    card.style.cssText = 'width:100%;opacity:0;transform:translateY(20px);transition:all 0.4s cubic-bezier(0.0,0.0,0.2,1);';
+    card.innerHTML = `
+      <div class="result-payout" style="color:${color}">${payText}</div>
+      <div class="result-payout-label">${result === 'win' ? 'won' : 'lost'}</div>
+      <div class="result-card">
+        <div class="result-row">
+          <span class="result-label">YOU</span>
+          <span>
+            <span class="result-answer" style="color:${data.myCorrect?'var(--win)':'var(--lose)'}">${data.myAnswer}</span>
+            <span class="result-time"> ${data.myTime}s</span>
+          </span>
+        </div>
+        <div class="result-divider"></div>
+        <div class="result-row">
+          <span class="result-label">${data.opponent}</span>
+          <span>
+            <span class="result-answer" style="color:${data.oppCorrect?'var(--win)':'var(--lose)'}">${data.oppAnswer}</span>
+            <span class="result-time"> ${data.oppTime}s</span>
+          </span>
+        </div>
+        <div class="result-divider"></div>
+        <div class="result-row">
+          <span class="result-label" style="color:var(--text2)">CORRECT</span>
+          <span class="result-answer" style="color:var(--win)">${data.correctAnswer}</span>
+        </div>
+      </div>
+    `;
+    stage.appendChild(card);
+    requestAnimationFrame(() => { card.style.opacity = '1'; card.style.transform = 'translateY(0)'; });
+  }, delay);
+}
+
+// ═══════════════════════════════════════════════
+// CONCEPT 1: THE HEARTBEAT
+// ═══════════════════════════════════════════════
+function buildHeartbeat(stage, data, result) {
+  stage.style.flexDirection = 'column';
+  const isWin = result === 'win';
+  const bothCorrect = data.myCorrect && data.oppCorrect;
+
+  // Heartbeat pulse layer
+  const pulse = document.createElement('div');
+  pulse.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:1;';
+  pulse.innerHTML = `<div id="hb-ring-${stage.id}" style="width:80px;height:80px;border-radius:50%;border:3px solid var(--accent);opacity:0.3;"></div>`;
+  stage.appendChild(pulse);
+
+  // Heartbeat animation
+  let bpm = 60, beatId;
+  const ring = pulse.querySelector('div');
+  function beat() {
+    ring.style.transition = 'transform 0.15s ease-out, opacity 0.15s';
+    ring.style.transform = 'scale(1.3)';
+    ring.style.opacity = '0.8';
+    setTimeout(() => {
+      ring.style.transform = 'scale(1)';
+      ring.style.opacity = '0.3';
+    }, 150);
+    beatId = setTimeout(beat, 60000 / bpm);
+  }
+  beat();
+
+  // Phase 1: Your answer (800ms)
+  const myEl = document.createElement('div');
+  myEl.style.cssText = 'position:relative;z-index:5;text-align:center;opacity:0;transform:scale(0.8);transition:all 0.3s ease-out;';
+  myEl.innerHTML = `
+    <div style="font-size:11px;color:var(--text2);font-weight:600;letter-spacing:2px;margin-bottom:8px">YOUR ANSWER</div>
+    <div style="font-size:22px;font-weight:800;color:${data.myCorrect?'var(--win)':'var(--lose)'}">${data.myAnswer}</div>
+    <div style="font-size:13px;color:var(--text2);margin-top:4px">${data.myTime}s</div>
+  `;
+  stage.appendChild(myEl);
+  setTimeout(() => { myEl.style.opacity='1'; myEl.style.transform='scale(1)'; bpm = data.myCorrect ? 90 : 50; }, 400);
+
+  // Phase 2: Opponent answer (1600ms) — THIS is the tension
+  setTimeout(() => {
+    if (data.myCorrect) bpm = 120; // accelerate if you got it right
+    myEl.style.transform = 'scale(0.7) translateY(-40px)';
+    myEl.style.opacity = '0.6';
+    
+    const oppEl = document.createElement('div');
+    oppEl.style.cssText = 'position:relative;z-index:5;text-align:center;opacity:0;transition:all 0.5s cubic-bezier(0.0,0.0,0.2,1);';
+    
+    // Slow reveal — blur to clear
+    oppEl.innerHTML = `
+      <div style="font-size:11px;color:var(--text2);font-weight:600;letter-spacing:2px;margin-bottom:8px">${data.opponent}</div>
+      <div id="opp-answer-${stage.id}" style="font-size:22px;font-weight:800;filter:blur(12px);transition:filter 0.8s ease-out;color:${data.oppCorrect?'var(--win)':'var(--lose)'}">${data.oppAnswer}</div>
+    `;
+    stage.appendChild(oppEl);
+    setTimeout(() => oppEl.style.opacity = '1', 50);
+    
+    // Deblur opponent answer
+    setTimeout(() => {
+      document.getElementById(`opp-answer-${stage.id}`).style.filter = 'blur(0)';
+      if (bothCorrect) bpm = 160;
+    }, 300);
+  }, 1600);
+
+  // Phase 3: Time race (if both correct) or result
+  if (bothCorrect) {
+    setTimeout(() => {
+      bpm = 200;
+      myEl.style.display = 'none';
+      // Clear opponent element too
+      const timeRace = document.createElement('div');
+      timeRace.style.cssText = 'position:relative;z-index:10;text-align:center;width:100%;padding:0 20px;';
+      timeRace.innerHTML = `
+        <div style="font-size:11px;color:var(--text2);font-weight:600;letter-spacing:2px;margin-bottom:16px">BOTH CORRECT — WHO'S FASTER?</div>
+        <div style="display:flex;justify-content:space-around;margin-bottom:8px;">
+          <div>
+            <div style="font-size:11px;color:var(--text2);font-weight:600">YOU</div>
+            <div style="font-size:28px;font-weight:900;color:var(--accent)">${data.myTime}s</div>
+          </div>
+          <div style="font-size:24px;font-weight:900;color:var(--text2);align-self:center">vs</div>
+          <div>
+            <div style="font-size:11px;color:var(--text2);font-weight:600">${data.opponent}</div>
+            <div id="race-time-${stage.id}" style="font-size:28px;font-weight:900;color:var(--accent)">0.00s</div>
+          </div>
+        </div>
+      `;
+      stage.appendChild(timeRace);
+
+      // Animate opponent time counting up
+      const raceEl = document.getElementById(`race-time-${stage.id}`);
+      let t = 0;
+      const target = data.oppTime;
+      const step = 30;
+      const inc = target / (1200 / step);
+      const ticker = setInterval(() => {
+        t = Math.min(t + inc, target);
+        raceEl.textContent = t.toFixed(2) + 's';
+        if (t >= target) {
+          clearInterval(ticker);
+          // RESULT EXPLOSION
+          setTimeout(() => {
+            clearTimeout(beatId);
+            ring.style.display = 'none';
+            timeRace.remove();
+
+            if (isWin) {
+              flashScreen(stage, 'rgba(34,197,94,0.3)');
+              shockwave(stage, '#22C55E');
+              stage.classList.add('shaking');
+              spawnConfetti(stage, 40, 'win');
+
+              const banner = document.createElement('div');
+              banner.className = 'result-banner';
+              banner.style.cssText = 'color:var(--win);position:relative;z-index:10;transform:scale(0);transition:transform 0.3s cubic-bezier(0.68,-0.55,0.265,1.55);margin-top:16px;';
+              banner.textContent = data.banner;
+              stage.appendChild(banner);
+              requestAnimationFrame(() => banner.style.transform = 'scale(1)');
+            } else {
+              flashScreen(stage, 'rgba(239,68,68,0.2)');
+              stage.classList.add('shaking');
+              const banner = document.createElement('div');
+              banner.className = 'result-banner';
+              banner.style.cssText = 'color:var(--lose);position:relative;z-index:10;transform:scale(0);transition:transform 0.3s ease-out;margin-top:16px;';
+              banner.textContent = data.banner;
+              stage.appendChild(banner);
+              requestAnimationFrame(() => banner.style.transform = 'scale(1)');
+            }
+            showDetails(stage, data, result, 400);
+          }, 300);
+        }
+      }, step);
+    }, 2800);
+  } else {
+    // One or both wrong — faster resolve
+    setTimeout(() => {
+      clearTimeout(beatId);
+      ring.style.display = 'none';
+      if (isWin) {
+        flashScreen(stage, 'rgba(34,197,94,0.3)');
+        spawnConfetti(stage, 30, 'win');
+      } else {
+        flashScreen(stage, 'rgba(239,68,68,0.2)');
+      }
+      stage.classList.add('shaking');
+      const banner = document.createElement('div');
+      banner.className = 'result-banner';
+      banner.style.cssText = `color:${isWin?'var(--win)':'var(--lose)'};position:relative;z-index:10;transform:scale(0);transition:transform 0.3s cubic-bezier(0.68,-0.55,0.265,1.55);`;
+      banner.textContent = data.banner;
+      stage.appendChild(banner);
+      requestAnimationFrame(() => banner.style.transform = 'scale(1)');
+      showDetails(stage, data, result, 400);
+    }, 2800);
+  }
+}
+
+// ═══════════════════════════════════════════════
+// CONCEPT 2: THE ENERGY ORB
+// ═══════════════════════════════════════════════
+function buildEnergyOrb(stage, data, result) {
+  stage.style.flexDirection = 'column';
+  const isWin = result === 'win';
+
+  // Orb
+  const orb = document.createElement('div');
+  orb.style.cssText = `
+    width:60px;height:60px;border-radius:50%;
+    background:radial-gradient(circle,var(--accent),var(--accent-dark));
+    box-shadow:0 0 20px var(--accent)40, 0 0 40px var(--accent)20;
+    position:relative;z-index:5;
+    transition: all 0.5s ease-out;
+  `;
+  stage.appendChild(orb);
+
+  // Label below orb
+  const label = document.createElement('div');
+  label.style.cssText = 'position:relative;z-index:5;margin-top:16px;font-size:12px;color:var(--text2);font-weight:600;letter-spacing:2px;text-align:center;transition:all 0.3s;';
+  label.textContent = 'CALCULATING...';
+  stage.appendChild(label);
+
+  // Phase 1: Your answer — orb reacts
+  setTimeout(() => {
+    label.textContent = `YOU: ${data.myAnswer}`;
+    if (data.myCorrect) {
+      orb.style.background = 'radial-gradient(circle,#22C55E,#16A34A)';
+      orb.style.boxShadow = '0 0 30px rgba(34,197,94,0.5), 0 0 60px rgba(34,197,94,0.2)';
+      orb.style.transform = 'scale(1.3)';
+    } else {
+      orb.style.background = 'radial-gradient(circle,#EF4444,#B91C1C)';
+      orb.style.boxShadow = '0 0 30px rgba(239,68,68,0.5)';
+      orb.style.transform = 'scale(0.8)';
+    }
+  }, 600);
+
+  // Phase 2: Opponent answer — orb intensifies
+  setTimeout(() => {
+    label.textContent = `${data.opponent}: ???`;
+    // Orb starts pulsing
+    orb.style.animation = 'orbPulse 0.4s ease-in-out infinite alternate';
+    const style = document.createElement('style');
+    style.textContent = `@keyframes orbPulse { 0%{transform:scale(1.3)} 100%{transform:scale(1.6)} }`;
+    stage.appendChild(style);
+  }, 1400);
+
+  setTimeout(() => {
+    label.textContent = `${data.opponent}: ${data.oppAnswer}`;
+    if (data.myCorrect && data.oppCorrect) {
+      orb.style.boxShadow = '0 0 50px rgba(34,197,94,0.6), 0 0 100px rgba(34,197,94,0.3), 0 0 150px rgba(34,197,94,0.1)';
+      // Add orbiting particles
+      for (let i = 0; i < 8; i++) {
+        const dot = document.createElement('div');
+        dot.style.cssText = `
+          position:absolute;width:4px;height:4px;border-radius:50%;
+          background:#fff;left:calc(50% - 2px);top:calc(50% - 2px);
+          animation:orbit${i} ${0.8+i*0.1}s linear infinite;
+          z-index:4;
+        `;
+        const r = 50 + i * 8;
+        const style2 = document.createElement('style');
+        style2.textContent = `@keyframes orbit${i} { 0%{transform:rotate(${i*45}deg) translateX(${r}px)} 100%{transform:rotate(${i*45+360}deg) translateX(${r}px)} }`;
+        stage.appendChild(style2);
+        stage.appendChild(dot);
+      }
+    }
+  }, 2000);
+
+  // Phase 3: DETONATION
+  setTimeout(() => {
+    orb.style.animation = 'none';
+    
+    if (isWin) {
+      // EXPLODE
+      orb.style.transition = 'all 0.2s ease-out';
+      orb.style.transform = 'scale(3)';
+      orb.style.opacity = '0';
+      flashScreen(stage, 'rgba(34,197,94,0.4)');
+      shockwave(stage, '#22C55E');
+      shockwave(stage, '#6C63FF');
+      stage.classList.add('shaking');
+      spawnConfetti(stage, 50, 'win');
+      label.textContent = '';
+
+      setTimeout(() => {
+        const banner = document.createElement('div');
+        banner.className = 'result-banner';
+        banner.style.cssText = 'color:var(--win);position:relative;z-index:10;transform:scale(0);transition:transform 0.3s cubic-bezier(0.68,-0.55,0.265,1.55);';
+        banner.textContent = data.banner;
+        stage.appendChild(banner);
+        requestAnimationFrame(() => banner.style.transform = 'scale(1)');
+        showDetails(stage, data, result, 300);
+      }, 200);
+    } else {
+      // Collapse
+      orb.style.transition = 'all 0.4s ease-in';
+      orb.style.transform = 'scale(0)';
+      orb.style.opacity = '0';
+      flashScreen(stage, 'rgba(239,68,68,0.2)');
+      stage.classList.add('shaking');
+      label.textContent = '';
+
+      setTimeout(() => {
+        const banner = document.createElement('div');
+        banner.className = 'result-banner';
+        banner.style.cssText = 'color:var(--lose);position:relative;z-index:10;opacity:0;transition:opacity 0.4s;';
+        banner.textContent = data.banner;
+        stage.appendChild(banner);
+        requestAnimationFrame(() => banner.style.opacity = '1');
+        showDetails(stage, data, result, 300);
+      }, 300);
+    }
+  }, 3000);
+}
+
+// ═══════════════════════════════════════════════
+// CONCEPT 3: THE CRACK
+// ═══════════════════════════════════════════════
+function buildCrack(stage, data, result) {
+  stage.style.flexDirection = 'column';
+  const isWin = result === 'win';
+
+  // Crack overlay using SVG
+  const crackSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  crackSvg.setAttribute('viewBox', '0 0 400 360');
+  crackSvg.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none;';
+  stage.appendChild(crackSvg);
+
+  // Light glow behind cracks
+  const glow = document.createElement('div');
+  glow.style.cssText = 'position:absolute;inset:0;opacity:0;transition:opacity 0.5s;z-index:2;pointer-events:none;';
+  stage.appendChild(glow);
+
+  const info = document.createElement('div');
+  info.style.cssText = 'position:relative;z-index:5;text-align:center;';
+  info.innerHTML = `<div style="font-size:12px;color:var(--text2);font-weight:600;letter-spacing:2px;">PROCESSING...</div>`;
+  stage.appendChild(info);
+
+  function addCrack(x1, y1, x2, y2, width, color) {
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', x1); line.setAttribute('y1', y1);
+    line.setAttribute('x2', x2); line.setAttribute('y2', y2);
+    line.setAttribute('stroke', color);
+    line.setAttribute('stroke-width', width);
+    line.setAttribute('stroke-linecap', 'round');
+    line.style.filter = `drop-shadow(0 0 4px ${color})`;
+    crackSvg.appendChild(line);
+  }
+
+  // Phase 1: Small cracks + your answer
+  setTimeout(() => {
+    const c = data.myCorrect ? '#22C55E' : '#EF4444';
+    addCrack(200, 180, 200+30, 180-40, 2, c);
+    addCrack(200, 180, 200-25, 180+35, 2, c);
+    glow.style.background = `radial-gradient(circle at 50% 50%, ${c}20 0%, transparent 60%)`;
+    glow.style.opacity = '0.5';
+    info.innerHTML = `
+      <div style="font-size:11px;color:var(--text2);font-weight:600;letter-spacing:2px;margin-bottom:4px">YOUR ANSWER</div>
+      <div style="font-size:20px;font-weight:800;color:${data.myCorrect?'var(--win)':'var(--lose)'}">${data.myAnswer}</div>
+    `;
+  }, 600);
+
+  // Phase 2: More cracks + opponent
+  setTimeout(() => {
+    info.innerHTML = `
+      <div style="font-size:11px;color:var(--text2);font-weight:600;letter-spacing:2px;margin-bottom:4px">${data.opponent}'S ANSWER</div>
+      <div style="font-size:20px;font-weight:800;color:var(--text2);filter:blur(8px);transition:filter 0.6s" id="crack-opp-${stage.id}">???</div>
+    `;
+    const c = data.myCorrect ? '#22C55E' : '#EF4444';
+    for (let i = 0; i < 6; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const len = 30 + Math.random() * 50;
+      addCrack(200, 180, 200 + Math.cos(angle)*len, 180 + Math.sin(angle)*len, 1.5, c);
+    }
+    glow.style.opacity = '0.8';
+  }, 1600);
+
+  setTimeout(() => {
+    const el = document.getElementById(`crack-opp-${stage.id}`);
+    if (el) {
+      el.textContent = data.oppAnswer;
+      el.style.filter = 'blur(0)';
+      el.style.color = data.oppCorrect ? 'var(--win)' : 'var(--lose)';
+    }
+    // Intensify cracks
+    for (let i = 0; i < 12; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const len = 40 + Math.random() * 120;
+      const c = isWin ? '#22C55E' : '#EF4444';
+      addCrack(200, 180, 200 + Math.cos(angle)*len, 180 + Math.sin(angle)*len, 1 + Math.random()*2, c);
+    }
+  }, 2200);
+
+  // Phase 3: SHATTER or seal
+  setTimeout(() => {
+    if (isWin) {
+      // Shatter effect
+      stage.style.background = `radial-gradient(circle, rgba(34,197,94,0.1) 0%, #fafafa 70%)`;
+      crackSvg.style.transition = 'opacity 0.3s';
+      crackSvg.style.opacity = '0';
+      flashScreen(stage, 'rgba(255,255,255,0.8)');
+      shockwave(stage, '#22C55E');
+      stage.classList.add('shaking');
+      spawnConfetti(stage, 45, 'win');
+      info.innerHTML = '';
+
+      setTimeout(() => {
+        const banner = document.createElement('div');
+        banner.className = 'result-banner';
+        banner.style.cssText = 'color:var(--win);position:relative;z-index:10;transform:scale(0);transition:transform 0.3s cubic-bezier(0.68,-0.55,0.265,1.55);';
+        banner.textContent = data.banner;
+        stage.appendChild(banner);
+        requestAnimationFrame(() => banner.style.transform = 'scale(1)');
+        showDetails(stage, data, result, 350);
+      }, 200);
+    } else {
+      glow.style.opacity = '0';
+      crackSvg.style.transition = 'opacity 0.8s';
+      crackSvg.style.opacity = '0';
+      flashScreen(stage, 'rgba(239,68,68,0.15)');
+      info.innerHTML = '';
+      const banner = document.createElement('div');
+      banner.className = 'result-banner';
+      banner.style.cssText = 'color:var(--lose);position:relative;z-index:10;opacity:0;transition:opacity 0.5s;';
+      banner.textContent = data.banner;
+      stage.appendChild(banner);
+      requestAnimationFrame(() => banner.style.opacity = '1');
+      showDetails(stage, data, result, 400);
+    }
+  }, 3200);
+}
+
+// ═══════════════════════════════════════════════
+// CONCEPT 4: THE COUNTDOWN RACE
+// ═══════════════════════════════════════════════
+function buildCountdownRace(stage, data, result) {
+  stage.style.flexDirection = 'column';
+  const isWin = result === 'win';
+  const bothCorrect = data.myCorrect && data.oppCorrect;
+
+  // Phase 1: Answers
+  const answers = document.createElement('div');
+  answers.style.cssText = 'position:relative;z-index:5;text-align:center;width:100%;padding:0 20px;';
+  answers.innerHTML = `
+    <div style="font-size:11px;color:var(--text2);font-weight:600;letter-spacing:2px;margin-bottom:16px">ANSWERS LOCKED IN</div>
+    <div style="display:flex;justify-content:space-around;">
+      <div style="opacity:0;transform:translateX(-20px);transition:all 0.4s ease-out;" id="race-you-${stage.id}">
+        <div style="font-size:11px;color:var(--text2);font-weight:600">YOU</div>
+        <div style="font-size:18px;font-weight:800;color:${data.myCorrect?'var(--win)':'var(--lose)'};">${data.myAnswer}</div>
+        <div style="font-size:12px;color:${data.myCorrect?'var(--win)':'var(--lose)'};margin-top:2px">${data.myCorrect?'CORRECT':'WRONG'}</div>
+      </div>
+      <div style="opacity:0;transform:translateX(20px);transition:all 0.4s ease-out;transition-delay:0.3s;" id="race-opp-${stage.id}">
+        <div style="font-size:11px;color:var(--text2);font-weight:600">${data.opponent}</div>
+        <div style="font-size:18px;font-weight:800;color:${data.oppCorrect?'var(--win)':'var(--lose)'};">${data.oppAnswer}</div>
+        <div style="font-size:12px;color:${data.oppCorrect?'var(--win)':'var(--lose)'};margin-top:2px">${data.oppCorrect?'CORRECT':'WRONG'}</div>
+      </div>
+    </div>
+  `;
+  stage.appendChild(answers);
+  setTimeout(() => { document.getElementById(`race-you-${stage.id}`).style.cssText += 'opacity:1;transform:translateX(0);'; }, 100);
+  setTimeout(() => { document.getElementById(`race-opp-${stage.id}`).style.cssText += 'opacity:1;transform:translateX(0);'; }, 100);
+
+  if (!bothCorrect) {
+    // Quick resolve — no time race needed
+    setTimeout(() => {
+      answers.remove();
+      if (isWin) {
+        flashScreen(stage, 'rgba(34,197,94,0.3)');
+        spawnConfetti(stage, 35, 'win');
+        stage.classList.add('shaking');
+      } else {
+        flashScreen(stage, 'rgba(239,68,68,0.2)');
+      }
+      const banner = document.createElement('div');
+      banner.className = 'result-banner';
+      banner.style.cssText = `color:${isWin?'var(--win)':'var(--lose)'};position:relative;z-index:10;transform:scale(0);transition:transform 0.3s cubic-bezier(0.68,-0.55,0.265,1.55);`;
+      banner.textContent = data.banner;
+      stage.appendChild(banner);
+      requestAnimationFrame(() => banner.style.transform = 'scale(1)');
+      showDetails(stage, data, result, 400);
+    }, 2000);
+    return;
+  }
+
+  // Phase 2: TIME RACE
+  setTimeout(() => {
+    answers.style.transition = 'all 0.3s';
+    answers.style.transform = 'translateY(-60px) scale(0.7)';
+    answers.style.opacity = '0.4';
+
+    const race = document.createElement('div');
+    race.style.cssText = 'position:relative;z-index:5;text-align:center;width:100%;padding:0 20px;';
+    race.innerHTML = `
+      <div style="font-size:11px;color:var(--text2);font-weight:600;letter-spacing:2px;margin-bottom:20px">WHO WAS FASTER?</div>
+      <div style="display:flex;justify-content:center;gap:32px;align-items:baseline;">
+        <div>
+          <div style="font-size:11px;color:var(--text2);font-weight:600;margin-bottom:4px">YOU</div>
+          <div id="race-t1-${stage.id}" style="font-size:36px;font-weight:900;color:var(--text);font-variant-numeric:tabular-nums;">0.00</div>
+        </div>
+        <div style="font-size:20px;font-weight:800;color:var(--border)">:</div>
+        <div>
+          <div style="font-size:11px;color:var(--text2);font-weight:600;margin-bottom:4px">${data.opponent}</div>
+          <div id="race-t2-${stage.id}" style="font-size:36px;font-weight:900;color:var(--text);font-variant-numeric:tabular-nums;">0.00</div>
+        </div>
+      </div>
+      <div id="race-bar-${stage.id}" style="margin-top:20px;height:6px;background:var(--border);border-radius:3px;overflow:hidden;position:relative;">
+        <div id="race-fill1-${stage.id}" style="position:absolute;left:0;top:0;height:100%;width:0;background:var(--accent);border-radius:3px;transition:width 0.05s linear;"></div>
+        <div id="race-fill2-${stage.id}" style="position:absolute;right:0;top:0;height:100%;width:0;background:var(--lose);border-radius:3px;transition:width 0.05s linear;"></div>
+      </div>
+    `;
+    stage.appendChild(race);
+
+    const t1El = document.getElementById(`race-t1-${stage.id}`);
+    const t2El = document.getElementById(`race-t2-${stage.id}`);
+    const fill1 = document.getElementById(`race-fill1-${stage.id}`);
+    const fill2 = document.getElementById(`race-fill2-${stage.id}`);
+    const maxTime = Math.max(data.myTime, data.oppTime);
+    const duration = 1800;
+    const step = 30;
+    let elapsed = 0;
+
+    const ticker = setInterval(() => {
+      elapsed += step;
+      const progress = Math.min(elapsed / duration, 1);
+      const t1 = Math.min(data.myTime * progress * (maxTime / data.myTime), data.myTime);
+      const t2 = Math.min(data.oppTime * progress * (maxTime / data.oppTime), data.oppTime);
+      t1El.textContent = t1.toFixed(2);
+      t2El.textContent = t2.toFixed(2);
+      fill1.style.width = `${(t1/maxTime)*50}%`;
+      fill2.style.width = `${(t2/maxTime)*50}%`;
+
+      // Intensify vibration as it gets close
+      if (progress > 0.6) {
+        const intensity = (progress - 0.6) * 5;
+        stage.style.transform = `translateX(${(Math.random()-0.5) * intensity * 3}px)`;
+      }
+
+      if (elapsed >= duration) {
+        clearInterval(ticker);
+        stage.style.transform = '';
+        t1El.textContent = data.myTime.toFixed(2);
+        t2El.textContent = data.oppTime.toFixed(2);
+
+        // Highlight winner
+        if (isWin) {
+          t1El.style.color = 'var(--win)';
+          t2El.style.color = 'var(--text2)';
+        } else {
+          t2El.style.color = 'var(--win)';
+          t1El.style.color = 'var(--text2)';
+        }
+
+        setTimeout(() => {
+          race.remove();
+          answers.remove();
+          if (isWin) {
+            flashScreen(stage, 'rgba(34,197,94,0.4)');
+            shockwave(stage, '#22C55E');
+            stage.classList.add('shaking');
+            spawnConfetti(stage, 50, 'win');
+          } else {
+            flashScreen(stage, 'rgba(239,68,68,0.2)');
+            stage.classList.add('shaking');
+          }
+          const banner = document.createElement('div');
+          banner.className = 'result-banner';
+          banner.style.cssText = `color:${isWin?'var(--win)':'var(--lose)'};position:relative;z-index:10;transform:scale(0);transition:transform 0.3s cubic-bezier(0.68,-0.55,0.265,1.55);`;
+          banner.textContent = data.banner;
+          stage.appendChild(banner);
+          requestAnimationFrame(() => banner.style.transform = 'scale(1)');
+          showDetails(stage, data, result, 400);
+        }, 600);
+      }
+    }, step);
+  }, 1800);
+}
+
+// ═══════════════════════════════════════════════
+// CONCEPT 5: THE LIGHTNING STORM
+// ═══════════════════════════════════════════════
+function buildLightningStorm(stage, data, result) {
+  stage.style.flexDirection = 'column';
+  const isWin = result === 'win';
+
+  // Storm overlay
+  const storm = document.createElement('div');
+  storm.style.cssText = 'position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden;';
+  stage.appendChild(storm);
+
+  function lightning(x, intensity) {
+    const bolt = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    bolt.setAttribute('viewBox', '0 0 100 360');
+    bolt.style.cssText = `position:absolute;left:${x}%;top:0;width:60px;height:100%;z-index:3;opacity:0;`;
+    
+    // Generate jagged bolt path
+    let path = `M ${40+Math.random()*20} 0`;
+    let cy = 0;
+    while (cy < 360) {
+      cy += 20 + Math.random() * 40;
+      const cx = 30 + Math.random() * 40;
+      path += ` L ${cx} ${cy}`;
+    }
+    
+    const color = intensity > 0.7 ? '#6C63FF' : '#fff';
+    bolt.innerHTML = `<path d="${path}" stroke="${color}" stroke-width="${1+intensity*2}" fill="none" filter="drop-shadow(0 0 ${4+intensity*8}px ${color})"/>`;
+    storm.appendChild(bolt);
+    
+    bolt.style.transition = 'opacity 0.05s';
+    bolt.style.opacity = '0.9';
+    setTimeout(() => bolt.style.opacity = '0', 80 + Math.random() * 120);
+    setTimeout(() => bolt.remove(), 400);
+  }
+
+  // Ambient rumble
+  let rumbleId;
+  function rumble(intensity) {
+    stage.style.transform = `translate(${(Math.random()-0.5)*intensity*4}px, ${(Math.random()-0.5)*intensity*2}px)`;
+    rumbleId = setTimeout(() => rumble(intensity), 50);
+  }
+
+  // Phase 1: Your answer with lightning strike
+  setTimeout(() => {
+    lightning(30, 0.5);
+    lightning(70, 0.3);
+    flashScreen(stage, data.myCorrect ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)');
+    
+    const myEl = document.createElement('div');
+    myEl.style.cssText = 'position:relative;z-index:5;text-align:center;opacity:0;transform:scale(0.8);transition:all 0.3s;';
+    myEl.innerHTML = `
+      <div style="font-size:11px;color:var(--text2);font-weight:600;letter-spacing:2px;margin-bottom:4px">YOUR ANSWER</div>
+      <div style="font-size:22px;font-weight:800;color:${data.myCorrect?'var(--win)':'var(--lose)'}">${data.myAnswer}</div>
+    `;
+    stage.appendChild(myEl);
+    requestAnimationFrame(() => { myEl.style.opacity='1'; myEl.style.transform='scale(1)'; });
+    rumble(0.3);
+  }, 500);
+
+  // Phase 2: Storm intensifies, opponent reveals
+  setTimeout(() => {
+    clearTimeout(rumbleId);
+    rumble(0.8);
+    lightning(20, 0.7);
+    lightning(50, 0.8);
+    lightning(80, 0.6);
+
+    const oppEl = document.createElement('div');
+    oppEl.style.cssText = 'position:relative;z-index:5;text-align:center;margin-top:12px;opacity:0;transition:all 0.4s;';
+    oppEl.innerHTML = `
+      <div style="font-size:11px;color:var(--text2);font-weight:600;letter-spacing:2px;margin-bottom:4px">${data.opponent}</div>
+      <div style="font-size:22px;font-weight:800;color:${data.oppCorrect?'var(--win)':'var(--lose)'}">${data.oppAnswer}</div>
+    `;
+    stage.appendChild(oppEl);
+
+    // Multiple lightning flashes as opponent reveals
+    setTimeout(() => { lightning(40, 0.9); oppEl.style.opacity = '1'; }, 200);
+    setTimeout(() => lightning(60, 0.7), 400);
+    setTimeout(() => lightning(30, 0.8), 600);
+  }, 1600);
+
+  // Phase 3: Peak storm + times
+  setTimeout(() => {
+    clearTimeout(rumbleId);
+    rumble(1.5);
+    // Rapid fire lightning
+    for (let i = 0; i < 6; i++) {
+      setTimeout(() => lightning(10 + Math.random()*80, 0.9), i * 100);
+    }
+
+    const timeEl = document.createElement('div');
+    timeEl.style.cssText = 'position:relative;z-index:5;text-align:center;margin-top:16px;opacity:0;transition:all 0.3s;';
+    timeEl.innerHTML = `
+      <div style="display:flex;justify-content:center;gap:24px;">
+        <div style="font-size:24px;font-weight:900;">${data.myTime}s</div>
+        <div style="font-size:18px;color:var(--text2);font-weight:700;align-self:center">vs</div>
+        <div style="font-size:24px;font-weight:900;">${data.oppTime}s</div>
+      </div>
+    `;
+    stage.appendChild(timeEl);
+    setTimeout(() => timeEl.style.opacity = '1', 100);
+  }, 2600);
+
+  // Phase 4: THE STRIKE — massive bolt + result
+  setTimeout(() => {
+    clearTimeout(rumbleId);
+    stage.style.transform = '';
+
+    // Clear everything
+    while (stage.children.length > 1) {
+      if (stage.lastChild !== storm) stage.removeChild(stage.lastChild);
+      else break;
+    }
+
+    if (isWin) {
+      // MASSIVE STRIKE
+      for (let i = 0; i < 5; i++) lightning(30 + i*10, 1.0);
+      flashScreen(stage, 'rgba(255,255,255,0.6)');
+      setTimeout(() => flashScreen(stage, 'rgba(34,197,94,0.3)'), 100);
+      shockwave(stage, '#6C63FF');
+      shockwave(stage, '#22C55E');
+      stage.classList.add('shaking');
+      spawnConfetti(stage, 50, 'win');
+
+      setTimeout(() => {
+        const banner = document.createElement('div');
+        banner.className = 'result-banner';
+        banner.style.cssText = 'color:var(--win);position:relative;z-index:10;transform:scale(0);transition:transform 0.3s cubic-bezier(0.68,-0.55,0.265,1.55);';
+        banner.textContent = data.banner;
+        stage.appendChild(banner);
+        requestAnimationFrame(() => banner.style.transform = 'scale(1)');
+        showDetails(stage, data, result, 350);
+      }, 200);
+    } else {
+      // Storm clears quietly
+      storm.style.transition = 'opacity 0.5s';
+      storm.style.opacity = '0';
+      flashScreen(stage, 'rgba(239,68,68,0.15)');
+
+      const banner = document.createElement('div');
+      banner.className = 'result-banner';
+      banner.style.cssText = 'color:var(--lose);position:relative;z-index:10;opacity:0;transition:opacity 0.5s;';
+      banner.textContent = data.banner;
+      stage.appendChild(banner);
+      requestAnimationFrame(() => banner.style.opacity = '1');
+      showDetails(stage, data, result, 400);
+    }
+  }, 3600);
+}
+
+</script>
+</body>
+</html>
