@@ -2,589 +2,891 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>SENSE — Countdown Race v2</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Countdown Tension Concepts — Sense</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Inter',sans-serif;background:#f0f0f3;color:#1A1A2E;min-height:100vh;-webkit-tap-highlight-color:transparent;padding-bottom:60px;}
-:root{
-  --bg:#f0f0f3;--card:rgba(255,255,255,0.85);--accent:#6C63FF;--accent-dark:#5A52E0;
-  --win:#22C55E;--lose:#EF4444;--draw:#F59E0B;--text:#1A1A2E;--text2:#6B7B94;
-  --border:rgba(0,0,0,0.06);--radius:16px;
-}
-.page-header{text-align:center;padding:16px 16px 2px;font-size:11px;color:var(--text2);font-weight:700;letter-spacing:2px;text-transform:uppercase;}
-.page-sub{text-align:center;padding:2px 16px 6px;font-size:10px;color:var(--text2);font-weight:500;}
-.section-label{padding:12px 16px 4px;font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;}
-.section-label.win-s{color:var(--win)}.section-label.lose-s{color:var(--lose)}.section-label.draw-s{color:var(--draw)}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #111; color: #fff; min-height: 100vh; }
 
-.scenario{
-  margin:4px 10px 14px;background:var(--card);border-radius:var(--radius);
-  border:1px solid var(--border);backdrop-filter:blur(8px);overflow:hidden;
-  box-shadow:0 2px 12px rgba(0,0,0,0.04);
-}
-.scenario-header{
-  padding:8px 12px 6px;border-bottom:1px solid var(--border);
-  display:flex;justify-content:space-between;align-items:center;
-}
-.scenario-title{font-size:12px;font-weight:700;}
-.scenario-tag{font-size:9px;font-weight:700;letter-spacing:1px;padding:2px 6px;border-radius:5px;color:#fff;}
-.tag-win{background:var(--win)}.tag-lose{background:var(--lose)}.tag-draw{background:var(--draw)}
+.selector { display: flex; gap: 8px; padding: 16px; flex-wrap: wrap; justify-content: center; background: #1a1a1a; border-bottom: 1px solid #333; position: sticky; top: 0; z-index: 100; }
+.selector button { padding: 10px 16px; border: 2px solid #444; border-radius: 12px; background: transparent; color: #ccc; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.selector button:hover { border-color: #888; color: #fff; }
+.selector button.active { border-color: #7c5cfc; background: rgba(124,92,252,0.15); color: #fff; }
 
-.stage{
-  position:relative;height:380px;overflow:hidden;background:#fafafa;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-}
+.concept-info { text-align: center; padding: 20px 16px 8px; }
+.concept-info h2 { font-size: 20px; margin-bottom: 6px; }
+.concept-info p { font-size: 14px; color: #888; max-width: 500px; margin: 0 auto; }
 
-.controls{display:flex;gap:6px;padding:8px 12px;border-top:1px solid var(--border);}
-.btn-play{
-  flex:1;padding:9px;border:none;border-radius:10px;font-weight:700;font-size:12px;
-  cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:1px;
-  background:var(--accent);color:#fff;transition:transform 0.1s;
-}
-.btn-play:active{transform:scale(0.96)}
-.btn-reset{
-  width:36px;background:var(--bg);border:1px solid var(--border);border-radius:10px;
-  cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;
-}
+.stage-wrap { display: flex; justify-content: center; padding: 16px; }
+.stage { width: 380px; height: 500px; background: #fafafa; border-radius: 20px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 40px; }
 
-.idle-text{color:var(--text2);font-size:12px;font-weight:500;letter-spacing:1px;}
+.replay-btn { display: block; margin: 16px auto; padding: 12px 32px; background: #7c5cfc; border: none; border-radius: 12px; color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; }
+.replay-btn:hover { background: #6a4aed; }
 
-.answer-card{
-  background:var(--card);border:1px solid var(--border);border-radius:10px;
-  padding:8px 14px;width:calc(100% - 28px);text-align:left;
-}
-.answer-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;}
-.answer-label{font-size:9px;font-weight:700;color:var(--text2);letter-spacing:1px;}
-.answer-val{font-size:13px;font-weight:700;}
-.answer-time{font-size:11px;color:var(--text2);font-weight:500;margin-left:6px;}
-.answer-divider{height:1px;background:var(--border);margin:2px 0;}
-.correct-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;}
+.outcome-btns { display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; }
+.outcome-btns button { padding: 8px 16px; border: 1px solid #444; border-radius: 8px; background: transparent; color: #ccc; font-size: 12px; cursor: pointer; }
+.outcome-btns button.active { border-color: #7c5cfc; background: rgba(124,92,252,0.15); color: #fff; }
 
-.result-banner{font-size:24px;font-weight:900;letter-spacing:2px;text-align:center;margin-top:8px;position:relative;z-index:10;}
-.result-payout{font-size:30px;font-weight:900;text-align:center;margin:4px 0 1px;}
-.result-payout-label{font-size:10px;color:var(--text2);text-align:center;font-weight:500;margin-bottom:4px;}
-.result-stats{display:flex;justify-content:center;gap:20px;margin-top:4px;}
-.result-stat{text-align:center;}
-.stat-num{font-size:18px;font-weight:800;display:block;}
-.stat-label{font-size:8px;font-weight:700;color:var(--text2);letter-spacing:1px;}
+/* Shared animation elements */
+.cr-answers { position: absolute; top: 30px; left: 50%; transform: translateX(-50%); width: 90%; text-align: center; transition: all 0.4s cubic-bezier(0,0,0.2,1); }
+.cr-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; transition: all 0.4s ease; opacity: 0; transform: translateY(20px); }
+.cr-label { font-size: 11px; font-weight: 700; color: #999; letter-spacing: 1px; }
+.cr-answer { font-size: 18px; font-weight: 800; }
+.cr-divider { height: 1px; background: #e0e0e0; margin: 0 16px; opacity: 0; transition: opacity 0.3s; }
+.cr-opp-answer { filter: blur(8px); transition: filter 0.3s; }
+.cr-opp-status { font-size: 11px; font-weight: 700; opacity: 0; transition: opacity 0.3s; }
 
-/* Action buttons */
-.action-btns{display:flex;gap:8px;padding:0 14px;margin-top:8px;width:100%;position:relative;z-index:10;}
-.btn-rib{
-  flex:1;padding:10px;border:none;border-radius:10px;font-weight:700;font-size:12px;
-  cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:1px;
-  background:#1A1A2E;color:#fff;
-  background:linear-gradient(180deg,#2A2A3E 0%,#1A1A2E 100%);
-  box-shadow:0 2px 8px rgba(0,0,0,0.2),inset 0 1px 0 rgba(255,255,255,0.1);
-}
-.btn-home{
-  padding:10px 14px;border:1px solid var(--border);border-radius:10px;font-weight:600;font-size:12px;
-  cursor:pointer;font-family:'Inter',sans-serif;color:var(--text2);background:var(--card);
-}
-
-/* Particles */
-.particle{position:absolute;pointer-events:none;}
-.confetti-up{animation:cupward ease-out forwards;}
-@keyframes cupward{
-  0%{opacity:1;transform:translate(0,0) rotate(0deg) scale(1)}
-  60%{opacity:1}
-  100%{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(var(--rot)) scale(0.3)}
-}
-.confetti-gravity{animation:cgravity ease-in forwards;}
-@keyframes cgravity{
-  0%{opacity:1;transform:translate(0,0) rotate(0deg)}
-  100%{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(var(--rot))}
-}
+/* Race bars */
+.cr-race { display: none; opacity: 0; transform: translateY(20px); transition: all 0.4s ease; position: absolute; top: 40px; left: 50%; transform: translateX(-50%); width: 85%; }
+.cr-race-row { display: flex; align-items: center; margin: 10px 0; gap: 10px; }
+.cr-race-label { font-size: 11px; font-weight: 700; color: #999; width: 50px; letter-spacing: 0.5px; }
+.cr-bar-track { flex: 1; height: 28px; background: #eee; border-radius: 14px; overflow: hidden; position: relative; }
+.cr-bar-fill { height: 100%; width: 0%; border-radius: 14px; transition: none; }
+.cr-bar-you { background: #7c5cfc; }
+.cr-bar-opp { background: #aaa; }
+.cr-time { font-size: 14px; font-weight: 700; color: #333; width: 50px; text-align: right; font-variant-numeric: tabular-nums; }
+.cr-gap { text-align: center; font-size: 13px; font-weight: 700; color: #7c5cfc; opacity: 0; transition: opacity 0.3s; margin-top: 4px; }
 
 /* Wrong stamp */
-.wrong-stamp{
-  position:absolute;font-size:60px;font-weight:900;color:var(--lose);
-  opacity:0;transform:scale(3) rotate(-12deg);z-index:12;
-  transition:all 0.25s cubic-bezier(0.34,1.56,0.64,1);pointer-events:none;
-}
-.wrong-stamp.slam{opacity:0.9;transform:scale(1) rotate(-12deg);}
-
-/* Shake */
-@keyframes shake{0%,100%{transform:translateX(0)}10%{transform:translateX(-8px) rotate(-0.5deg)}20%{transform:translateX(8px) rotate(0.5deg)}30%{transform:translateX(-5px)}40%{transform:translateX(5px)}50%{transform:translateX(-2px)}60%{transform:translateX(2px)}}
-.shaking{animation:shake 0.5s ease-out}
+.cr-wrong-stamp { position: absolute; font-size: 64px; font-weight: 900; color: rgba(239,68,68,0.7); top: 15%; left: 50%; transform: translate(-50%,-50%) scale(3) rotate(-15deg); opacity: 0; transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1); pointer-events: none; z-index: 5; }
+.cr-wrong-stamp.cr-slam { transform: translate(-50%,-50%) scale(1) rotate(-15deg); opacity: 1; }
 
 /* Flash */
-.flash{position:absolute;inset:0;pointer-events:none;opacity:0;z-index:20}
-.flash.go{animation:flashPop 0.35s ease-out forwards}
-@keyframes flashPop{0%{opacity:0.85}100%{opacity:0}}
+.cr-flash { position: absolute; inset: 0; pointer-events: none; opacity: 0; z-index: 20; border-radius: 20px; }
+.cr-flash-go { animation: crFlash 0.5s ease-out forwards; }
+@keyframes crFlash { from { opacity: 1; } to { opacity: 0; } }
 
 /* Shockwave */
-.shockwave{position:absolute;border-radius:50%;pointer-events:none;border:3px solid;opacity:0;z-index:15}
-.shockwave.go{animation:swExpand 0.7s ease-out forwards}
-@keyframes swExpand{0%{transform:scale(0.1);opacity:0.8}100%{transform:scale(4);opacity:0}}
+.cr-shockwave { position: absolute; width: 60px; height: 60px; border-radius: 50%; border: 3px solid; top: 50%; left: 50%; transform: translate(-50%,-50%) scale(0.1); opacity: 0; pointer-events: none; z-index: 15; }
+.cr-sw-go { animation: crSW 0.7s ease-out forwards; }
+@keyframes crSW { 0% { transform: translate(-50%,-50%) scale(0.1); opacity: 0.9; } 100% { transform: translate(-50%,-50%) scale(4); opacity: 0; } }
 
-/* Red pulse for losses */
-.red-pulse{position:absolute;inset:0;pointer-events:none;opacity:0;z-index:14;background:radial-gradient(circle at center,rgba(239,68,68,0.3) 0%,transparent 70%)}
-.red-pulse.go{animation:rpulse 0.8s ease-out forwards}
-@keyframes rpulse{0%{opacity:0;transform:scale(0.5)}30%{opacity:1}100%{opacity:0;transform:scale(1.5)}}
+/* Confetti */
+.cr-confetti { position: absolute; border-radius: 2px; pointer-events: none; z-index: 12; }
+.cr-pop { animation: crPop 0.6s cubic-bezier(0.25,0.46,0.45,0.94) forwards; }
+@keyframes crPop { 0% { transform: translate(0,0) rotate(0deg) scale(1); opacity: 1; } 100% { transform: translate(var(--dx),var(--dy)) rotate(var(--rot)) scale(0.3); opacity: 0; } }
+.cr-fall { animation: crFall 0.9s ease-in forwards; }
+@keyframes crFall { 0% { transform: translate(0,0) rotate(0deg); opacity: 0.7; } 100% { transform: translate(var(--dx),var(--dy)) rotate(var(--rot)); opacity: 0; } }
+
+/* Concept-specific: Heartbeat */
+.heartbeat-line { position: absolute; bottom: 30px; left: 0; width: 100%; height: 60px; z-index: 8; pointer-events: none; }
+.heartbeat-dot { position: absolute; width: 8px; height: 8px; border-radius: 50%; background: #ef4444; top: 50%; left: 0; transform: translate(-50%, -50%); z-index: 9; filter: drop-shadow(0 0 6px rgba(239,68,68,0.8)); }
+.heartbeat-vignette { position: absolute; inset: 0; border-radius: 20px; pointer-events: none; z-index: 7; opacity: 0; transition: opacity 0.15s; background: radial-gradient(ellipse at center, transparent 40%, rgba(239,68,68,0.15) 100%); }
+
+/* Concept: Pressure Gauge */
+.pressure-ring { position: absolute; width: 320px; height: 320px; border-radius: 50%; border: 4px solid transparent; top: 50%; left: 50%; transform: translate(-50%,-50%); pointer-events: none; z-index: 6; transition: border-color 0.1s; }
+.pressure-glow { position: absolute; inset: 0; border-radius: 20px; pointer-events: none; z-index: 6; opacity: 0; background: radial-gradient(ellipse at center, transparent 30%, rgba(255,100,0,0.2) 100%); }
+.pressure-text { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); font-size: 36px; font-weight: 900; color: rgba(255,100,0,0.6); z-index: 8; font-variant-numeric: tabular-nums; letter-spacing: -2px; }
+
+/* Concept: Fuse */
+.fuse-container { position: absolute; bottom: 40px; left: 20px; right: 20px; height: 6px; background: #ddd; border-radius: 3px; z-index: 8; overflow: visible; }
+.fuse-burn { height: 100%; width: 0%; background: linear-gradient(90deg, #333 0%, #ef4444 80%, #ff6600 100%); border-radius: 3px; position: relative; }
+.fuse-spark { position: absolute; right: -2px; top: 50%; width: 12px; height: 12px; background: #ffaa00; border-radius: 50%; transform: translateY(-50%); filter: drop-shadow(0 0 8px #ff6600) drop-shadow(0 0 16px #ff4400); }
+.fuse-particle { position: absolute; width: 3px; height: 3px; border-radius: 50%; pointer-events: none; z-index: 9; }
+.fuse-trail { position: absolute; bottom: 36px; left: 20px; right: 20px; height: 30px; z-index: 9; pointer-events: none; overflow: visible; }
+
+/* Concept: Strobe */
+.strobe-overlay { position: absolute; inset: 0; background: #000; border-radius: 20px; z-index: 25; pointer-events: none; opacity: 0; }
+
+/* Concept: Seismograph */
+.seismo-container { position: absolute; bottom: 20px; left: 10px; right: 10px; height: 80px; z-index: 8; pointer-events: none; }
+.seismo-canvas { width: 100%; height: 100%; }
+.seismo-scale { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: 14px; font-weight: 800; color: rgba(124,92,252,0.6); font-variant-numeric: tabular-nums; }
 </style>
 </head>
 <body>
 
-<div class="page-header">COUNTDOWN RACE v2 — ALL SCENARIOS</div>
-<div class="page-sub">13 scenarios — upgraded explosions, stamps, money counter, buttons</div>
+<div class="selector">
+  <button class="active" onclick="selectConcept(0)">1. Cardiac</button>
+  <button onclick="selectConcept(1)">2. Pressure</button>
+  <button onclick="selectConcept(2)">3. Fuse</button>
+  <button onclick="selectConcept(3)">4. Blackout</button>
+  <button onclick="selectConcept(4)">5. Seismic</button>
+</div>
 
-<div class="section-label win-s">WINS (5)</div>
-<div id="wins"></div>
-<div class="section-label lose-s">LOSSES (5)</div>
-<div id="losses"></div>
-<div class="section-label draw-s">DRAWS (3)</div>
-<div id="draws"></div>
+<div class="concept-info" id="info"></div>
+<div class="outcome-btns">
+  <button class="active" onclick="setOutcome('win')">WIN (fast)</button>
+  <button onclick="setOutcome('close-win')">CLOSE WIN</button>
+  <button onclick="setOutcome('loss')">LOSS</button>
+</div>
+<div class="stage-wrap"><div class="stage" id="stage"></div></div>
+<button class="replay-btn" onclick="play()">▶ Replay</button>
 
 <script>
-const SCENARIOS = [
-  {id:'w-blowout',section:'wins',title:'Blowout — You Dominated',tag:'WIN',tagClass:'tag-win',
-    data:{myAnswer:'Red Fox',myCorrect:true,myTime:1.42,oppAnswer:'Red Fox',oppCorrect:true,oppTime:5.87,
-      correctAnswer:'Red Fox',opponent:'SLOWPOKE',payout:'2.00',wager:'1.00',result:'win',
-      banner:"DESTROYED",stats:{wins:8,draws:1,losses:2}}},
-  {id:'w-comfortable',section:'wins',title:'Comfortable — Clear Gap',tag:'WIN',tagClass:'tag-win',
-    data:{myAnswer:'Red Fox',myCorrect:true,myTime:2.31,oppAnswer:'Red Fox',oppCorrect:true,oppTime:3.14,
-      correctAnswer:'Red Fox',opponent:'PLAYER_42',payout:'2.00',wager:'1.00',result:'win',
-      banner:"LET'S GO",stats:{wins:5,draws:1,losses:2}}},
-  {id:'w-photo',section:'wins',title:'Photo Finish — 0.03s Gap',tag:'WIN',tagClass:'tag-win',
-    data:{myAnswer:'Bengal Tiger',myCorrect:true,myTime:1.87,oppAnswer:'Bengal Tiger',oppCorrect:true,oppTime:1.90,
-      correctAnswer:'Bengal Tiger',opponent:'RIVAL_X',payout:'2.00',wager:'1.00',result:'win',
-      banner:"BY A HAIR",stats:{wins:7,draws:1,losses:2}}},
-  {id:'w-opp-wrong',section:'wins',title:'They Got It Wrong',tag:'WIN',tagClass:'tag-win',
-    data:{myAnswer:'Red Fox',myCorrect:true,myTime:3.50,oppAnswer:'Arctic Fox',oppCorrect:false,oppTime:2.10,
-      correctAnswer:'Red Fox',opponent:'SPEEDSTER',payout:'2.00',wager:'1.00',result:'win',
-      banner:"BUILT DIFFERENT",stats:{wins:6,draws:1,losses:2}}},
-  {id:'w-opp-timeout',section:'wins',title:'They Timed Out',tag:'WIN',tagClass:'tag-win',
-    data:{myAnswer:'Red Fox',myCorrect:true,myTime:4.20,oppAnswer:'Timed out',oppCorrect:false,oppTime:null,
-      correctAnswer:'Red Fox',opponent:'AFK_ANDY',payout:'2.00',wager:'1.00',result:'win',
-      banner:"FREE MONEY",stats:{wins:9,draws:1,losses:2}}},
-  {id:'l-blowout',section:'losses',title:'Blowout — Got Cooked',tag:'LOSE',tagClass:'tag-lose',
-    data:{myAnswer:'Red Fox',myCorrect:true,myTime:5.87,oppAnswer:'Red Fox',oppCorrect:true,oppTime:1.42,
-      correctAnswer:'Red Fox',opponent:'LIGHTNING',payout:'0',wager:'1.00',result:'lose',
-      banner:"GOT COOKED",stats:{wins:5,draws:1,losses:5}}},
-  {id:'l-comfortable',section:'losses',title:'Comfortable — Clear Gap',tag:'LOSE',tagClass:'tag-lose',
-    data:{myAnswer:'Red Fox',myCorrect:true,myTime:3.14,oppAnswer:'Red Fox',oppCorrect:true,oppTime:2.31,
-      correctAnswer:'Red Fox',opponent:'PLAYER_42',payout:'0',wager:'1.00',result:'lose',
-      banner:"ALMOST HAD IT",stats:{wins:5,draws:1,losses:3}}},
-  {id:'l-photo',section:'losses',title:'Photo Finish — 0.03s Gap',tag:'LOSE',tagClass:'tag-lose',
-    data:{myAnswer:'Bengal Tiger',myCorrect:true,myTime:1.90,oppAnswer:'Bengal Tiger',oppCorrect:true,oppTime:1.87,
-      correctAnswer:'Bengal Tiger',opponent:'RIVAL_X',payout:'0',wager:'1.00',result:'lose',
-      banner:"SO CLOSE",stats:{wins:5,draws:1,losses:3}}},
-  {id:'l-you-wrong',section:'losses',title:'You Got It Wrong',tag:'LOSE',tagClass:'tag-lose',
-    data:{myAnswer:'Arctic Fox',myCorrect:false,myTime:2.10,oppAnswer:'Red Fox',oppCorrect:true,oppTime:3.50,
-      correctAnswer:'Red Fox',opponent:'BRAINIAC',payout:'0',wager:'1.00',result:'lose',
-      banner:"NEXT ONE'S YOURS",stats:{wins:5,draws:1,losses:4}}},
-  {id:'l-you-timeout',section:'losses',title:'You Timed Out',tag:'LOSE',tagClass:'tag-lose',
-    data:{myAnswer:'Timed out',myCorrect:false,myTime:null,oppAnswer:'Red Fox',oppCorrect:true,oppTime:3.20,
-      correctAnswer:'Red Fox',opponent:'STILL_HERE',payout:'0',wager:'1.00',result:'lose',
-      banner:"FELL ASLEEP",stats:{wins:5,draws:1,losses:5}}},
-  {id:'d-same-time',section:'draws',title:'Both Correct, Exact Same Time',tag:'DRAW',tagClass:'tag-draw',
-    data:{myAnswer:'Red Fox',myCorrect:true,myTime:2.50,oppAnswer:'Red Fox',oppCorrect:true,oppTime:2.50,
-      correctAnswer:'Red Fox',opponent:'TWIN',payout:'1.00',wager:'1.00',result:'draw',
-      banner:"DEAD HEAT",stats:{wins:5,draws:2,losses:3}}},
-  {id:'d-both-wrong',section:'draws',title:'Both Wrong',tag:'DRAW',tagClass:'tag-draw',
-    data:{myAnswer:'Arctic Fox',myCorrect:false,myTime:3.20,oppAnswer:'Gray Wolf',oppCorrect:false,oppTime:2.80,
-      correctAnswer:'Red Fox',opponent:'GUESSER',payout:'1.00',wager:'1.00',result:'draw',
-      banner:"STALEMATE",stats:{wins:5,draws:3,losses:3}}},
-  {id:'d-both-timeout',section:'draws',title:'Both Timed Out',tag:'DRAW',tagClass:'tag-draw',
-    data:{myAnswer:'Timed out',myCorrect:false,myTime:null,oppAnswer:'Timed out',oppCorrect:false,oppTime:null,
-      correctAnswer:'Red Fox',opponent:'AFK_ANDY',payout:'1.00',wager:'1.00',result:'draw',
-      banner:"NOBODY HOME",stats:{wins:5,draws:4,losses:3}}},
+let currentConcept = 0;
+let currentOutcome = 'win';
+let timers = [];
+let intervals = [];
+
+const concepts = [
+  {
+    name: "Cardiac Monitor",
+    desc: "ECG flatline runs across the bottom. Each bar tick triggers a heartbeat blip — slow calm beats that accelerate into tachycardia. Screen edges pulse red on every beat. At the climax the heart STOPS — flatline — then the explosion is the defibrillator shock."
+  },
+  {
+    name: "Pressure Cooker",
+    desc: "A ring of light tightens around the stage as bars fill. The edges glow orange → red, a PSI counter climbs in the background. The whole stage slowly scales down 2% like it's being crushed. At critical pressure — rupture explosion. The release IS the result."
+  },
+  {
+    name: "Burning Fuse",
+    desc: "A lit fuse burns across the bottom of the screen synced to the bars. Sparks fly from the burn point, smoke trails behind. The fuse gets faster as it approaches the end. When it hits the dynamite — BOOM. The explosion comes from the fuse endpoint."
+  },
+  {
+    name: "Blackout Strobe",
+    desc: "Screen goes dark. Rapid strobe flashes freeze-frame the bars at increasing intervals — flash, dark, flash, dark — each flash revealing more progress. Between flashes only the time numbers glow in the void. Final flash HOLDS and detonates."
+  },
+  {
+    name: "Seismograph",
+    desc: "A live seismograph line draws across the bottom, reacting to the bar race. Starts as gentle tremors, builds to violent spikes. A Richter scale number climbs. When it hits 10.0 the needle goes off-chart and the earthquake becomes the explosion."
+  }
 ];
 
-['wins','losses','draws'].forEach(sec=>{
-  const container=document.getElementById(sec);
-  SCENARIOS.filter(s=>s.section===sec).forEach(s=>{
-    const div=document.createElement('div');div.className='scenario';
-    div.innerHTML=`
-      <div class="scenario-header">
-        <span class="scenario-title">${s.title}</span>
-        <span class="scenario-tag ${s.tagClass}">${s.tag}</span>
-      </div>
-      <div class="stage" id="stage-${s.id}"><span class="idle-text">TAP PLAY</span></div>
-      <div class="controls">
-        <button class="btn-play" onclick="runScenario('${s.id}')">PLAY</button>
-        <button class="btn-reset" onclick="resetScenario('${s.id}')">↺</button>
-      </div>`;
-    container.appendChild(div);
-  });
-});
+const outcomes = {
+  'win': { myTime: 0.92, oppTime: 3.60, myCorrect: true, oppCorrect: true, myAnswer: 'Owl', oppAnswer: 'Owl' },
+  'close-win': { myTime: 1.85, oppTime: 2.01, myCorrect: true, oppCorrect: true, myAnswer: 'Owl', oppAnswer: 'Owl' },
+  'loss': { myTime: 3.20, oppTime: 1.15, myCorrect: true, oppCorrect: true, myAnswer: 'Owl', oppAnswer: 'Owl' }
+};
 
-function resetScenario(id){
-  const stage=document.getElementById(`stage-${id}`);
-  stage.innerHTML='<span class="idle-text">TAP PLAY</span>';
-  stage.className='stage';
-}
-function runScenario(id){
-  const s=SCENARIOS.find(x=>x.id===id);
-  const stage=document.getElementById(`stage-${id}`);
-  stage.innerHTML='';stage.className='stage';
-  countdownRace(stage,s.data,id);
+function haptic(ms) {
+  if (navigator.vibrate) navigator.vibrate(ms);
 }
 
-// ── Haptic ──
-function haptic(ms){try{navigator.vibrate&&navigator.vibrate(ms||15)}catch(e){}}
-
-// ── Confetti cannon (shoots UP then gravity) ──
-function spawnConfettiCannon(stage,count,type){
-  const palettes={
-    win:['#22C55E','#6C63FF','#F59E0B','#00D4AA','#fff','#34D399','#A78BFA','#EC4899'],
-    lose:['#EF4444','#991B1B','#7F1D1D','#6B7B94'],
-    draw:['#F59E0B','#FBBF24','#6B7B94','#ddd','#fff']
-  };
-  const colors=palettes[type]||palettes.draw;
-  const stageRect=stage.getBoundingClientRect();
-  for(let i=0;i<count;i++){
-    const p=document.createElement('div');p.className='particle confetti-up';
-    const size=4+Math.random()*8;
-    const dx=(Math.random()-0.5)*280;
-    const dy=-(120+Math.random()*220);
-    const rot=Math.random()*900-450;
-    const dur=0.6+Math.random()*0.5;
-    p.style.cssText=`width:${size}px;height:${size*0.6}px;background:${colors[Math.floor(Math.random()*colors.length)]};left:50%;top:55%;--dx:${dx}px;--dy:${dy}px;--rot:${rot}deg;animation-duration:${dur}s;animation-delay:${Math.random()*0.1}s;border-radius:${Math.random()>0.4?'1px':'50%'};`;
-    stage.appendChild(p);
-    // Second wave: gravity fall after upward burst
-    setTimeout(()=>{
-      const p2=document.createElement('div');p2.className='particle confetti-gravity';
-      const dx2=(Math.random()-0.5)*200;
-      const dy2=150+Math.random()*200;
-      p2.style.cssText=`width:${size}px;height:${size*0.6}px;background:${colors[Math.floor(Math.random()*colors.length)]};left:${30+Math.random()*40}%;top:${10+Math.random()*20}%;--dx:${dx2}px;--dy:${dy2}px;--rot:${Math.random()*360}deg;animation-duration:${0.8+Math.random()*0.6}s;border-radius:${Math.random()>0.4?'1px':'50%'};`;
-      stage.appendChild(p2);
-    },(dur*0.6)*1000+Math.random()*200);
-  }
+function selectConcept(i) {
+  currentConcept = i;
+  document.querySelectorAll('.selector button').forEach((b,j) => b.classList.toggle('active', j===i));
+  play();
 }
 
-function flashScreen(stage,color){
-  const f=document.createElement('div');f.className='flash';f.style.background=color;
-  stage.appendChild(f);requestAnimationFrame(()=>f.classList.add('go'));
-  haptic(30);
-}
-function shockwave(stage,color){
-  const s=document.createElement('div');s.className='shockwave';
-  s.style.cssText=`width:60px;height:60px;left:calc(50% - 30px);top:calc(50% - 30px);border-color:${color};`;
-  stage.appendChild(s);requestAnimationFrame(()=>s.classList.add('go'));
-}
-function redPulse(stage){
-  const r=document.createElement('div');r.className='red-pulse';
-  stage.appendChild(r);requestAnimationFrame(()=>r.classList.add('go'));
+function setOutcome(o) {
+  currentOutcome = o;
+  document.querySelectorAll('.outcome-btns button').forEach(b => b.classList.toggle('active', b.textContent.toLowerCase().includes(o.replace('-',''))));
+  play();
 }
 
-// ── Wrong stamp ──
-function slamWrongStamp(stage){
-  const stamp=document.createElement('div');
-  stamp.className='wrong-stamp';
-  stamp.textContent='✕';
-  stamp.style.cssText+='left:50%;top:50%;transform-origin:center;margin-left:-30px;margin-top:-40px;';
-  stage.appendChild(stamp);
-  haptic(40);
-  requestAnimationFrame(()=>{stamp.classList.add('slam');});
-  return stamp;
+function t(fn, ms) { const id = setTimeout(fn, ms); timers.push(id); return id; }
+
+function clearAll() {
+  timers.forEach(clearTimeout);
+  intervals.forEach(clearInterval);
+  timers = []; intervals = [];
 }
 
-// ── Money counter ──
-function countMoney(el,target,color,duration){
-  const val=parseFloat(target);
-  const steps=Math.ceil(duration/30);
-  let step=0;
-  const prefix=color==='var(--lose)'?'-$':'+$';
-  const tick=setInterval(()=>{
-    step++;
-    const progress=step/steps;
-    const eased=1-Math.pow(1-progress,3);
-    const current=(val*eased).toFixed(2);
-    el.textContent=prefix+current;
-    if(step>=steps){clearInterval(tick);el.textContent=prefix+val.toFixed(2);}
-  },30);
-}
+function play() {
+  clearAll();
+  const info = document.getElementById('info');
+  const c = concepts[currentConcept];
+  info.innerHTML = `<h2>${c.name}</h2><p>${c.desc}</p>`;
 
-function showFinalDetails(stage,d,delay){
-  setTimeout(()=>{
-    const color=d.result==='win'?'var(--win)':d.result==='lose'?'var(--lose)':'var(--draw)';
-    const isWin=d.result==='win';
-    const isDraw=d.result==='draw';
-    const payVal=isWin?d.payout:isDraw?d.payout:d.wager;
-    const payLabel=isWin?'won':isDraw?'returned':'lost';
+  const stage = document.getElementById('stage');
+  stage.innerHTML = '';
+  stage.style.transform = '';
 
-    const wrap=document.createElement('div');
-    wrap.style.cssText='width:100%;opacity:0;transform:translateY(16px);transition:all 0.4s cubic-bezier(0,0,0.2,1);position:relative;z-index:10;';
+  const o = outcomes[currentOutcome];
+  const isWin = o.myTime < o.oppTime;
 
-    const payoutDisplay=isDraw?`$${d.payout} returned`:'$0.00';
-
-    wrap.innerHTML=`
-      <div class="result-payout" id="pay-${d.result}-${Math.random().toString(36).substr(2,4)}" style="color:${color}">${payoutDisplay}</div>
-      <div class="result-payout-label">${payLabel}</div>
-      <div class="answer-card" style="margin:6px 14px;width:calc(100% - 28px);">
-        <div class="answer-row">
-          <span class="answer-label">YOU</span>
-          <span><span class="answer-val" style="color:${d.myCorrect?'var(--win)':'var(--lose)'}">${d.myAnswer}</span>${d.myTime!=null?`<span class="answer-time">${d.myTime}s</span>`:''}</span>
-        </div>
-        <div class="answer-divider"></div>
-        <div class="answer-row">
-          <span class="answer-label">${d.opponent}</span>
-          <span><span class="answer-val" style="color:${d.oppCorrect?'var(--win)':'var(--lose)'}">${d.oppAnswer}</span>${d.oppTime!=null?`<span class="answer-time">${d.oppTime}s</span>`:''}</span>
-        </div>
-        <div class="answer-divider"></div>
-        <div class="correct-row">
-          <span class="answer-label">CORRECT</span>
-          <span class="answer-val" style="color:var(--win)">${d.correctAnswer}</span>
-        </div>
-      </div>
-      <div class="result-stats">
-        <div class="result-stat"><span class="stat-num" style="color:var(--win)">${d.stats.wins}</span><span class="stat-label">WINS</span></div>
-        <div class="result-stat"><span class="stat-num" style="color:var(--draw)">${d.stats.draws}</span><span class="stat-label">DRAWS</span></div>
-        <div class="result-stat"><span class="stat-num" style="color:var(--lose)">${d.stats.losses}</span><span class="stat-label">LOSSES</span></div>
-      </div>
-      <div class="action-btns">
-        <button class="btn-rib" style="opacity:0;transform:translateY(8px);transition:all 0.3s 0.2s;">RUN IT BACK</button>
-        <button class="btn-home" style="opacity:0;transform:translateY(8px);transition:all 0.3s 0.35s;">HOME</button>
-      </div>
-    `;
-    stage.appendChild(wrap);
-    requestAnimationFrame(()=>{
-      wrap.style.opacity='1';wrap.style.transform='translateY(0)';
-      // Count up money
-      if(!isDraw){
-        const payEl=wrap.querySelector('.result-payout');
-        setTimeout(()=>countMoney(payEl,payVal,color,600),100);
-      }
-      // Fade in buttons
-      const btns=wrap.querySelectorAll('.action-btns button');
-      setTimeout(()=>{btns.forEach(b=>{b.style.opacity='1';b.style.transform='translateY(0)';});},400);
-    });
-  },delay);
-}
-
-function countdownRace(stage,d,id){
-  const isWin=d.result==='win';
-  const isDraw=d.result==='draw';
-  const bothCorrect=d.myCorrect&&d.oppCorrect;
-  const resultColor=isWin?'var(--win)':isDraw?'var(--draw)':'var(--lose)';
-  const rawColor=isWin?'#22C55E':isDraw?'#F59E0B':'#EF4444';
-
-  // PHASE 1: ANSWERS
-  const p1=document.createElement('div');
-  p1.style.cssText='position:relative;z-index:5;text-align:center;width:100%;padding:0 16px;';
-
-  const youBlock=document.createElement('div');
-  youBlock.style.cssText='opacity:0;transform:translateY(14px);transition:all 0.4s cubic-bezier(0,0,0.2,1);margin-bottom:12px;';
-  youBlock.innerHTML=`
-    <div style="font-size:9px;color:var(--text2);font-weight:700;letter-spacing:2px;margin-bottom:4px">YOUR ANSWER</div>
-    <div style="font-size:22px;font-weight:900;color:${d.myCorrect?'var(--win)':'var(--lose)'}">${d.myAnswer}</div>
-    <div style="font-size:11px;font-weight:700;color:${d.myCorrect?'var(--win)':'var(--lose)'};margin-top:1px;letter-spacing:1px">${d.myCorrect?'✓ CORRECT':'✕ WRONG'}</div>
+  // Build answer cards
+  const answers = document.createElement('div');
+  answers.className = 'cr-answers';
+  answers.innerHTML = `
+    <div class="cr-row cr-you"><div><div class="cr-label">YOU</div><div class="cr-answer" style="color:#22c55e">${o.myAnswer}</div></div><div class="cr-answer" style="color:#333">${o.myTime.toFixed(2)}s</div></div>
+    <div class="cr-divider"></div>
+    <div class="cr-row cr-opp"><div><div class="cr-label">OPPONENT</div><div class="cr-answer cr-opp-answer">${o.oppAnswer}</div></div><div><span class="cr-opp-status"></span></div></div>
   `;
-  p1.appendChild(youBlock);
+  stage.appendChild(answers);
 
-  const divLine=document.createElement('div');
-  divLine.style.cssText='width:36px;height:2px;background:var(--border);margin:0 auto 12px;opacity:0;transition:opacity 0.3s 0.3s;';
-  p1.appendChild(divLine);
-
-  const oppBlock=document.createElement('div');
-  oppBlock.style.cssText='opacity:0;transform:translateY(14px);transition:all 0.5s cubic-bezier(0,0,0.2,1);';
-  oppBlock.innerHTML=`
-    <div style="font-size:9px;color:var(--text2);font-weight:700;letter-spacing:2px;margin-bottom:4px">${d.opponent}</div>
-    <div id="opp-reveal-${id}" style="font-size:22px;font-weight:900;filter:blur(12px);color:var(--text2);transition:filter 0.6s ease-out,color 0.3s">???</div>
-    <div id="opp-status-${id}" style="font-size:11px;font-weight:700;margin-top:1px;letter-spacing:1px;color:var(--text2);opacity:0;transition:opacity 0.3s">...</div>
+  // Build race element
+  const race = document.createElement('div');
+  race.className = 'cr-race';
+  race.innerHTML = `
+    <div class="cr-race-row"><div class="cr-race-label">YOU</div><div class="cr-bar-track"><div class="cr-bar-fill cr-bar-you"></div></div><div class="cr-time cr-time-you">0.00s</div></div>
+    <div class="cr-race-row"><div class="cr-race-label">OPP</div><div class="cr-bar-track"><div class="cr-bar-fill cr-bar-opp"></div></div><div class="cr-time cr-time-opp">0.00s</div></div>
+    <div class="cr-gap"></div>
   `;
-  p1.appendChild(oppBlock);
-  stage.appendChild(p1);
+  stage.appendChild(race);
 
-  // Animate your answer in
-  setTimeout(()=>{youBlock.style.opacity='1';youBlock.style.transform='translateY(0)';haptic(10);},200);
-  // If you got it wrong, slam stamp on your answer
-  if(!d.myCorrect){
-    setTimeout(()=>{
-      const stamp=document.createElement('div');stamp.className='wrong-stamp';
-      stamp.textContent='✕';
-      stamp.style.cssText+='left:50%;top:22%;margin-left:-30px;';
-      p1.appendChild(stamp);
-      haptic(40);
-      requestAnimationFrame(()=>stamp.classList.add('slam'));
-    },600);
-  }
-  setTimeout(()=>{divLine.style.opacity='1';},500);
-  setTimeout(()=>{oppBlock.style.opacity='1';oppBlock.style.transform='translateY(0)';},800);
+  // Animate answer reveal
+  const youEl = answers.querySelector('.cr-you');
+  const divEl = answers.querySelector('.cr-divider');
+  const oppEl = answers.querySelector('.cr-opp');
+  const oppReveal = answers.querySelector('.cr-opp-answer');
+  const oppStatus = answers.querySelector('.cr-opp-status');
 
-  // Deblur opponent with haptic
-  setTimeout(()=>{
-    const oppEl=document.getElementById(`opp-reveal-${id}`);
-    const oppSt=document.getElementById(`opp-status-${id}`);
-    oppEl.textContent=d.oppAnswer;
-    oppEl.style.filter='blur(0)';
-    oppEl.style.color=d.oppCorrect?'var(--win)':'var(--lose)';
-    oppSt.textContent=d.oppCorrect?'✓ CORRECT':'✕ WRONG';
-    oppSt.style.color=d.oppCorrect?'var(--win)':'var(--lose)';
-    oppSt.style.opacity='1';
+  t(() => { youEl.style.opacity='1'; youEl.style.transform='translateY(0)'; haptic(10); }, 200);
+  t(() => { divEl.style.opacity='1'; }, 500);
+  t(() => { oppEl.style.opacity='1'; oppEl.style.transform='translateY(0)'; }, 800);
+  t(() => {
+    oppReveal.style.filter='blur(0)';
+    oppReveal.style.color='#22c55e';
+    oppStatus.textContent='✓ CORRECT';
+    oppStatus.style.color='#22c55e';
+    oppStatus.style.opacity='1';
     haptic(20);
-    // If opponent wrong, slam stamp
-    if(!d.oppCorrect){
-      setTimeout(()=>{
-        const stamp=document.createElement('div');stamp.className='wrong-stamp';
-        stamp.textContent='✕';
-        stamp.style.cssText+='left:50%;top:62%;margin-left:-30px;';
-        p1.appendChild(stamp);
-        haptic(40);
-        requestAnimationFrame(()=>stamp.classList.add('slam'));
-      },200);
-    }
-  },1500);
+  }, 1500);
 
-  // PHASE 2: TIME RACE or RESOLVE
-  if(bothCorrect && d.myTime!=null && d.oppTime!=null){
-    setTimeout(()=>{
-      p1.style.transition='all 0.4s cubic-bezier(0,0,0.2,1)';
-      p1.style.transform='translateY(-44px) scale(0.6)';
-      p1.style.opacity='0.2';
-
-      const race=document.createElement('div');
-      race.style.cssText='position:relative;z-index:5;text-align:center;width:100%;padding:0 14px;opacity:0;transform:translateY(8px);transition:all 0.3s;';
-
-      const sameTime=d.myTime===d.oppTime;
-      race.innerHTML=`
-        <div style="font-size:9px;color:var(--text2);font-weight:700;letter-spacing:2px;margin-bottom:12px">
-          ${sameTime?'COMPARING TIMES...':'WHO WAS FASTER?'}
-        </div>
-        <div style="display:flex;justify-content:center;gap:12px;align-items:center;margin-bottom:12px;">
-          <div style="flex:1;text-align:center;">
-            <div style="font-size:9px;color:var(--text2);font-weight:700;margin-bottom:3px">YOU</div>
-            <div id="rt1-${id}" style="font-size:28px;font-weight:900;color:var(--text);font-variant-numeric:tabular-nums;line-height:1;">0.00<span style="font-size:12px;font-weight:600;color:var(--text2)">s</span></div>
-          </div>
-          <div style="font-size:14px;font-weight:900;color:var(--border)">vs</div>
-          <div style="flex:1;text-align:center;">
-            <div style="font-size:9px;color:var(--text2);font-weight:700;margin-bottom:3px">${d.opponent}</div>
-            <div id="rt2-${id}" style="font-size:28px;font-weight:900;color:var(--text);font-variant-numeric:tabular-nums;line-height:1;">0.00<span style="font-size:12px;font-weight:600;color:var(--text2)">s</span></div>
-          </div>
-        </div>
-        <div style="display:flex;gap:4px;height:6px;">
-          <div style="flex:1;background:var(--border);border-radius:3px;overflow:hidden;position:relative;">
-            <div id="bar1-${id}" style="position:absolute;right:0;top:0;height:100%;width:0;background:var(--accent);border-radius:3px;transition:width 0.03s linear;"></div>
-          </div>
-          <div style="flex:1;background:var(--border);border-radius:3px;overflow:hidden;position:relative;">
-            <div id="bar2-${id}" style="position:absolute;left:0;top:0;height:100%;width:0;background:var(--lose);border-radius:3px;transition:width 0.03s linear;"></div>
-          </div>
-        </div>
-        <div id="gap-${id}" style="margin-top:8px;font-size:10px;color:var(--text2);font-weight:600;opacity:0;transition:opacity 0.2s;"></div>
-      `;
-      stage.appendChild(race);
-      requestAnimationFrame(()=>{race.style.opacity='1';race.style.transform='translateY(0)';});
-
-      const t1El=document.getElementById(`rt1-${id}`);
-      const t2El=document.getElementById(`rt2-${id}`);
-      const bar1=document.getElementById(`bar1-${id}`);
-      const bar2=document.getElementById(`bar2-${id}`);
-      const gapEl=document.getElementById(`gap-${id}`);
-
-      const maxTime=Math.max(d.myTime,d.oppTime);
-      const duration=2000;
-      const step=25;
-      let elapsed=0;
-      let gapShown=false;
-
-      const ticker=setInterval(()=>{
-        elapsed+=step;
-        const progress=Math.min(elapsed/duration,1);
-        const displayMax=maxTime*progress*1.1;
-        const t1=Math.min(displayMax,d.myTime);
-        const t2=Math.min(displayMax,d.oppTime);
-        t1El.innerHTML=`${t1.toFixed(2)}<span style="font-size:12px;font-weight:600;color:var(--text2)">s</span>`;
-        t2El.innerHTML=`${t2.toFixed(2)}<span style="font-size:12px;font-weight:600;color:var(--text2)">s</span>`;
-        bar1.style.width=`${(t1/maxTime)*100}%`;
-        bar2.style.width=`${(t2/maxTime)*100}%`;
-
-        // Show gap when one stops
-        if(!gapShown){
-          if(t1>=d.myTime&&t2<d.oppTime){
-            gapEl.textContent=`+${(d.oppTime-d.myTime).toFixed(2)}s gap`;
-            gapEl.style.opacity='1';gapShown=true;haptic(15);
-          }else if(t2>=d.oppTime&&t1<d.myTime){
-            gapEl.textContent=`+${(d.myTime-d.oppTime).toFixed(2)}s gap`;
-            gapEl.style.opacity='1';gapShown=true;haptic(15);
-          }
-        }
-
-        // Vibration builds
-        if(progress>0.7){
-          const intensity=(progress-0.7)*10;
-          stage.style.transform=`translateX(${(Math.random()-0.5)*intensity*3}px)`;
-          if(progress>0.9)haptic(5);
-        }
-
-        if(elapsed>=duration){
-          clearInterval(ticker);
-          stage.style.transform='';
-          t1El.innerHTML=`${d.myTime.toFixed(2)}<span style="font-size:12px;font-weight:600;color:var(--text2)">s</span>`;
-          t2El.innerHTML=`${d.oppTime.toFixed(2)}<span style="font-size:12px;font-weight:600;color:var(--text2)">s</span>`;
-
-          if(d.myTime<d.oppTime){
-            t1El.style.color='var(--win)';t2El.style.color='var(--text2)';
-            bar1.style.background='var(--win)';
-          }else if(d.oppTime<d.myTime){
-            t2El.style.color='var(--win)';t1El.style.color='var(--text2)';
-            bar2.style.background='var(--win)';
-          }else{
-            t1El.style.color='var(--draw)';t2El.style.color='var(--draw)';
-            bar1.style.background='var(--draw)';bar2.style.background='var(--draw)';
-            gapEl.textContent='EXACT SAME TIME';
-            gapEl.style.opacity='1';gapEl.style.color='var(--draw)';
-          }
-          haptic(50);
-
-          setTimeout(()=>{
-            race.remove();p1.remove();
-            doExplosion(stage,d,rawColor,resultColor);
-          },700);
-        }
-      },step);
-    },2400);
-  }else{
-    // One wrong or timeout — pause on stamp, then resolve
-    setTimeout(()=>{p1.remove();doExplosion(stage,d,rawColor,resultColor);},2800);
-  }
+  // Start time race
+  t(() => startRace(stage, answers, race, o), 2400);
 }
 
-function doExplosion(stage,d,rawColor,resultColor){
-  const isWin=d.result==='win';
-  const isDraw=d.result==='draw';
+function startRace(stage, answers, race, o) {
+  answers.style.transition = 'all 0.4s cubic-bezier(0,0,0.2,1)';
+  answers.style.transform = 'translateX(-50%) translateY(-44px) scale(0.6)';
+  answers.style.opacity = '0.2';
 
-  if(isWin){
-    flashScreen(stage,'rgba(255,255,255,0.9)');
-    setTimeout(()=>flashScreen(stage,'rgba(34,197,94,0.3)'),80);
-    shockwave(stage,'#22C55E');
-    setTimeout(()=>shockwave(stage,'#6C63FF'),120);
-    setTimeout(()=>shockwave(stage,'#F59E0B'),220);
-    stage.classList.add('shaking');
-    spawnConfettiCannon(stage,60,'win');
-    haptic([30,20,50]);
-  }else if(isDraw){
-    flashScreen(stage,'rgba(245,158,11,0.25)');
-    shockwave(stage,'#F59E0B');
-    spawnConfettiCannon(stage,25,'draw');
-    haptic(25);
-  }else{
-    // Loss: red pulse, not a party
-    flashScreen(stage,'rgba(239,68,68,0.4)');
-    redPulse(stage);
-    shockwave(stage,'#EF4444');
-    stage.classList.add('shaking');
-    spawnConfettiCannon(stage,12,'lose');
-    haptic([50,30,50]);
+  race.style.display = 'block';
+  requestAnimationFrame(() => {
+    race.style.opacity = '1';
+    race.style.transform = 'translateX(-50%) translateY(0)';
+  });
+
+  const isWin = o.myTime < o.oppTime;
+  const conceptFn = [conceptCardiac, conceptPressure, conceptFuse, conceptBlackout, conceptSeismic][currentConcept];
+  conceptFn(stage, race, o, isWin);
+}
+
+// ========== CONCEPT 1: CARDIAC MONITOR ==========
+function conceptCardiac(stage, race, o, isWin) {
+  // ECG line canvas
+  const canvas = document.createElement('canvas');
+  canvas.className = 'heartbeat-line';
+  canvas.width = 380; canvas.height = 60;
+  stage.appendChild(canvas);
+  const ctx = canvas.getContext('2d');
+
+  // Vignette
+  const vig = document.createElement('div');
+  vig.className = 'heartbeat-vignette';
+  stage.appendChild(vig);
+
+  // Tracking dot
+  const dot = document.createElement('div');
+  dot.className = 'heartbeat-dot';
+  stage.appendChild(dot);
+
+  const t1 = race.querySelector('.cr-time-you');
+  const t2 = race.querySelector('.cr-time-opp');
+  const bar1 = race.querySelector('.cr-bar-you');
+  const bar2 = race.querySelector('.cr-bar-opp');
+  const gap = race.querySelector('.cr-gap');
+
+  const maxTime = Math.max(o.myTime, o.oppTime);
+  const duration = 2000;
+  const step = 20;
+  let elapsed = 0;
+  let gapShown = false;
+
+  // ECG data
+  let ecgX = 0;
+  const ecgHistory = [];
+  let lastBeat = 0;
+  let beatInterval = 600; // start slow — calm heart
+
+  // Draw flatline initially
+  ctx.strokeStyle = 'rgba(239,68,68,0.4)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(0, 30);
+  ctx.lineTo(380, 30);
+  ctx.stroke();
+
+  const ticker = setInterval(() => {
+    elapsed += step;
+    const progress = Math.min(elapsed / duration, 1);
+
+    // Bar race
+    const displayMax = maxTime * progress * 1.1;
+    const ct1 = Math.min(displayMax, o.myTime);
+    const ct2 = Math.min(displayMax, o.oppTime);
+    t1.textContent = ct1.toFixed(2) + 's';
+    t2.textContent = ct2.toFixed(2) + 's';
+    bar1.style.width = `${(ct1/maxTime)*100}%`;
+    bar2.style.width = `${(ct2/maxTime)*100}%`;
+
+    if (!gapShown && ((ct1 >= o.myTime && ct2 < o.oppTime) || (ct2 >= o.oppTime && ct1 < o.myTime))) {
+      gap.textContent = `+${Math.abs(o.oppTime - o.myTime).toFixed(2)}s gap`;
+      gap.style.opacity = '1'; gapShown = true;
+    }
+
+    // Heartbeat — accelerating BPM
+    beatInterval = 600 - progress * 480; // 600ms → 120ms (100bpm → 500bpm!)
+    const timeSinceLastBeat = elapsed - lastBeat;
+
+    // ECG drawing
+    ecgX = (progress * 380);
+    ctx.clearRect(0, 0, 380, 60);
+    ctx.strokeStyle = `rgba(239,68,68,${0.3 + progress * 0.5})`;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+
+    if (timeSinceLastBeat >= beatInterval) {
+      lastBeat = elapsed;
+      // BEAT! Pulse the vignette
+      vig.style.opacity = String(0.3 + progress * 0.7);
+      setTimeout(() => { vig.style.opacity = '0'; }, 100);
+      haptic(Math.floor(5 + progress * 25));
+
+      // Add heartbeat spike to history
+      ecgHistory.push({ x: ecgX, type: 'beat' });
+
+      // Shake on beat
+      const shakeAmt = 1 + progress * 6;
+      stage.style.transform = `translate(${(Math.random()-0.5)*shakeAmt}px, ${(Math.random()-0.5)*shakeAmt*0.5}px)`;
+      setTimeout(() => { if (elapsed < duration) stage.style.transform = ''; }, 80);
+    }
+
+    // Draw ECG trace
+    for (let x = Math.max(0, ecgX - 300); x <= ecgX; x += 2) {
+      const relX = x;
+      const isBeat = ecgHistory.some(b => Math.abs(b.x - x) < 8);
+      let y = 30;
+      if (isBeat) {
+        const beatDist = Math.min(...ecgHistory.map(b => Math.abs(b.x - x)));
+        const phase = (x - ecgHistory.find(b => Math.abs(b.x - x) < 8).x);
+        if (phase < -4) y = 30;
+        else if (phase < -2) y = 30 - 8;
+        else if (phase < 0) y = 30 + 22;
+        else if (phase < 2) y = 30 - 18;
+        else if (phase < 4) y = 30 + 4;
+        else y = 30;
+      }
+      if (x === Math.max(0, ecgX - 300)) ctx.moveTo(relX, y);
+      else ctx.lineTo(relX, y);
+    }
+    ctx.stroke();
+
+    // Dot position
+    dot.style.left = ecgX + 'px';
+    dot.style.bottom = '50px';
+
+    // Shake intensity builds
+    if (progress > 0.5) {
+      const intensity = Math.pow((progress - 0.5) * 2, 2) * 8;
+      const dx = (Math.random()-0.5) * intensity;
+      const dy = (Math.random()-0.5) * intensity * 0.4;
+      stage.style.transform = `translate(${dx}px, ${dy}px)`;
+    }
+
+    if (elapsed >= duration) {
+      clearInterval(ticker);
+
+      // FLATLINE moment
+      ctx.clearRect(0, 0, 380, 60);
+      ctx.strokeStyle = 'rgba(239,68,68,0.8)';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(0, 30); ctx.lineTo(380, 30);
+      ctx.stroke();
+      vig.style.opacity = '0';
+      stage.style.transform = '';
+
+      // Color final bars
+      if (isWin) {
+        t1.style.color='#22c55e'; bar1.style.background='#22c55e';
+      } else {
+        t2.style.color='#22c55e'; bar2.style.background='#22c55e';
+      }
+
+      // Brief flatline pause... then DEFIB SHOCK
+      t(() => {
+        canvas.remove(); vig.remove(); dot.remove();
+        race.remove(); answers?.remove();
+        doExplosion(stage, isWin);
+      }, 500);
+    }
+  }, step);
+  intervals.push(ticker);
+}
+
+// ========== CONCEPT 2: PRESSURE COOKER ==========
+function conceptPressure(stage, race, o, isWin) {
+  const glow = document.createElement('div');
+  glow.className = 'pressure-glow';
+  stage.appendChild(glow);
+
+  const psiText = document.createElement('div');
+  psiText.className = 'pressure-text';
+  psiText.textContent = '0 PSI';
+  stage.appendChild(psiText);
+
+  // Tightening ring
+  const ring = document.createElement('div');
+  ring.style.cssText = 'position:absolute;inset:0;border-radius:20px;pointer-events:none;z-index:6;box-shadow:inset 0 0 0 0 rgba(255,100,0,0);transition:box-shadow 0.1s;';
+  stage.appendChild(ring);
+
+  const t1 = race.querySelector('.cr-time-you');
+  const t2 = race.querySelector('.cr-time-opp');
+  const bar1 = race.querySelector('.cr-bar-you');
+  const bar2 = race.querySelector('.cr-bar-opp');
+  const gap = race.querySelector('.cr-gap');
+  const maxTime = Math.max(o.myTime, o.oppTime);
+  const duration = 2000;
+  const step = 20;
+  let elapsed = 0;
+  let gapShown = false;
+
+  const ticker = setInterval(() => {
+    elapsed += step;
+    const progress = Math.min(elapsed / duration, 1);
+    const displayMax = maxTime * progress * 1.1;
+    const ct1 = Math.min(displayMax, o.myTime);
+    const ct2 = Math.min(displayMax, o.oppTime);
+    t1.textContent = ct1.toFixed(2) + 's';
+    t2.textContent = ct2.toFixed(2) + 's';
+    bar1.style.width = `${(ct1/maxTime)*100}%`;
+    bar2.style.width = `${(ct2/maxTime)*100}%`;
+
+    if (!gapShown && ((ct1 >= o.myTime && ct2 < o.oppTime) || (ct2 >= o.oppTime && ct1 < o.myTime))) {
+      gap.textContent = `+${Math.abs(o.oppTime - o.myTime).toFixed(2)}s gap`;
+      gap.style.opacity = '1'; gapShown = true;
+    }
+
+    // Pressure builds
+    const psi = Math.floor(Math.pow(progress, 1.5) * 999);
+    psiText.textContent = psi + ' PSI';
+    psiText.style.color = `rgba(${200 + progress * 55}, ${100 - progress * 80}, 0, ${0.3 + progress * 0.5})`;
+
+    // Glow intensifies
+    glow.style.opacity = String(progress * 0.8);
+    glow.style.background = `radial-gradient(ellipse at center, transparent ${40 - progress * 30}%, rgba(${Math.floor(255)},${Math.floor(100 - progress*80)},0,${progress * 0.35}) 100%)`;
+
+    // Ring tightens (inset shadow)
+    const spread = Math.floor(progress * 25);
+    ring.style.boxShadow = `inset 0 0 ${spread * 3}px ${spread}px rgba(255,${Math.floor(100-progress*80)},0,${progress * 0.3})`;
+
+    // Stage compresses
+    const scale = 1 - progress * 0.03;
+    const shake = progress > 0.3 ? (Math.random()-0.5) * progress * 8 : 0;
+    const shakeY = progress > 0.3 ? (Math.random()-0.5) * progress * 3 : 0;
+    stage.style.transform = `scale(${scale}) translate(${shake}px, ${shakeY}px)`;
+
+    // Haptic pulses
+    if (progress > 0.5 && elapsed % 100 < step) haptic(Math.floor(progress * 20));
+
+    // Warning flashes at high pressure
+    if (progress > 0.7 && elapsed % 200 < step) {
+      psiText.style.transform = 'translateX(-50%) scale(1.2)';
+      setTimeout(() => { psiText.style.transform = 'translateX(-50%) scale(1)'; }, 100);
+    }
+
+    if (elapsed >= duration) {
+      clearInterval(ticker);
+      if (isWin) { t1.style.color='#22c55e'; bar1.style.background='#22c55e'; }
+      else { t2.style.color='#22c55e'; bar2.style.background='#22c55e'; }
+
+      // RUPTURE
+      psiText.textContent = '999 PSI';
+      psiText.style.fontSize = '48px';
+      psiText.style.color = 'rgba(239,68,68,0.8)';
+      t(() => {
+        glow.remove(); psiText.remove(); ring.remove();
+        race.remove(); stage.querySelector('.cr-answers')?.remove();
+        stage.style.transform = '';
+        doExplosion(stage, isWin);
+      }, 400);
+    }
+  }, step);
+  intervals.push(ticker);
+}
+
+// ========== CONCEPT 3: BURNING FUSE ==========
+function conceptFuse(stage, race, o, isWin) {
+  const fuseC = document.createElement('div');
+  fuseC.className = 'fuse-container';
+  const fuseBurn = document.createElement('div');
+  fuseBurn.className = 'fuse-burn';
+  const spark = document.createElement('div');
+  spark.className = 'fuse-spark';
+  fuseBurn.appendChild(spark);
+  fuseC.appendChild(fuseBurn);
+  stage.appendChild(fuseC);
+
+  // Dynamite at the end
+  const dynamite = document.createElement('div');
+  dynamite.style.cssText = 'position:absolute;bottom:28px;right:14px;font-size:28px;z-index:9;';
+  dynamite.textContent = '💥';
+  dynamite.style.opacity = '0.6';
+  stage.appendChild(dynamite);
+
+  const t1 = race.querySelector('.cr-time-you');
+  const t2 = race.querySelector('.cr-time-opp');
+  const bar1 = race.querySelector('.cr-bar-you');
+  const bar2 = race.querySelector('.cr-bar-opp');
+  const gapEl = race.querySelector('.cr-gap');
+  const maxTime = Math.max(o.myTime, o.oppTime);
+  const duration = 2000;
+  const step = 20;
+  let elapsed = 0;
+  let gapShown = false;
+
+  const ticker = setInterval(() => {
+    elapsed += step;
+    const progress = Math.min(elapsed / duration, 1);
+    const displayMax = maxTime * progress * 1.1;
+    const ct1 = Math.min(displayMax, o.myTime);
+    const ct2 = Math.min(displayMax, o.oppTime);
+    t1.textContent = ct1.toFixed(2) + 's';
+    t2.textContent = ct2.toFixed(2) + 's';
+    bar1.style.width = `${(ct1/maxTime)*100}%`;
+    bar2.style.width = `${(ct2/maxTime)*100}%`;
+
+    if (!gapShown && ((ct1 >= o.myTime && ct2 < o.oppTime) || (ct2 >= o.oppTime && ct1 < o.myTime))) {
+      gapEl.textContent = `+${Math.abs(o.oppTime - o.myTime).toFixed(2)}s gap`;
+      gapEl.style.opacity = '1'; gapShown = true;
+    }
+
+    // Fuse burns
+    fuseBurn.style.width = `${progress * 100}%`;
+
+    // Spark particles
+    if (elapsed % 60 < step) {
+      const particle = document.createElement('div');
+      particle.className = 'fuse-particle';
+      const sparkX = 20 + (progress * (380 - 40));
+      particle.style.cssText = `
+        position:absolute;bottom:${38 + Math.random()*20}px;left:${sparkX}px;
+        width:${2+Math.random()*3}px;height:${2+Math.random()*3}px;
+        background:${Math.random()>0.5?'#ffaa00':'#ff6600'};border-radius:50%;
+        z-index:10;opacity:1;transition:all ${0.3+Math.random()*0.3}s ease-out;
+      `;
+      stage.appendChild(particle);
+      requestAnimationFrame(() => {
+        particle.style.transform = `translate(${(Math.random()-0.5)*30}px, ${-20-Math.random()*30}px)`;
+        particle.style.opacity = '0';
+      });
+      setTimeout(() => particle.remove(), 600);
+    }
+
+    // Smoke trail (subtle dark particles behind)
+    if (elapsed % 100 < step && progress > 0.1) {
+      const smoke = document.createElement('div');
+      const smokeX = 20 + ((progress - 0.05) * (380 - 40));
+      smoke.style.cssText = `
+        position:absolute;bottom:${40+Math.random()*10}px;left:${smokeX}px;
+        width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;
+        background:rgba(0,0,0,0.1);border-radius:50%;z-index:7;
+        transition:all 0.8s ease-out;
+      `;
+      stage.appendChild(smoke);
+      requestAnimationFrame(() => {
+        smoke.style.transform = `translateY(${-15-Math.random()*20}px)`;
+        smoke.style.opacity = '0';
+      });
+      setTimeout(() => smoke.remove(), 1000);
+    }
+
+    // Shake builds
+    const intensity = 1 + Math.pow(progress, 2) * 10;
+    const dx = (Math.random()-0.5) * intensity;
+    const dy = (Math.random()-0.5) * intensity * 0.3;
+    stage.style.transform = `translate(${dx}px, ${dy}px)`;
+    if (progress > 0.6) haptic(5);
+
+    // Dynamite gets more nervous
+    if (progress > 0.7) {
+      dynamite.style.transform = `rotate(${(Math.random()-0.5)*20}deg)`;
+      dynamite.style.opacity = '1';
+    }
+
+    if (elapsed >= duration) {
+      clearInterval(ticker);
+      if (isWin) { t1.style.color='#22c55e'; bar1.style.background='#22c55e'; }
+      else { t2.style.color='#22c55e'; bar2.style.background='#22c55e'; }
+
+      dynamite.style.fontSize = '48px';
+      haptic(50);
+
+      t(() => {
+        fuseC.remove(); dynamite.remove();
+        race.remove(); stage.querySelector('.cr-answers')?.remove();
+        stage.style.transform = '';
+        doExplosion(stage, isWin);
+      }, 400);
+    }
+  }, step);
+  intervals.push(ticker);
+}
+
+// ========== CONCEPT 4: BLACKOUT STROBE ==========
+function conceptBlackout(stage, race, o, isWin) {
+  const overlay = document.createElement('div');
+  overlay.className = 'strobe-overlay';
+  overlay.style.opacity = '1';
+  stage.appendChild(overlay);
+
+  // Glowing numbers in the dark
+  const glowNum = document.createElement('div');
+  glowNum.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:72px;font-weight:900;color:rgba(124,92,252,0.8);z-index:30;text-shadow:0 0 30px rgba(124,92,252,0.6);opacity:0;transition:all 0.15s;';
+  stage.appendChild(glowNum);
+
+  const t1 = race.querySelector('.cr-time-you');
+  const t2 = race.querySelector('.cr-time-opp');
+  const bar1 = race.querySelector('.cr-bar-you');
+  const bar2 = race.querySelector('.cr-bar-opp');
+  const gapEl = race.querySelector('.cr-gap');
+  const maxTime = Math.max(o.myTime, o.oppTime);
+  const duration = 2000;
+  const step = 20;
+  let elapsed = 0;
+  let gapShown = false;
+  let lastFlash = 0;
+  let flashInterval = 400; // slow at start
+
+  const ticker = setInterval(() => {
+    elapsed += step;
+    const progress = Math.min(elapsed / duration, 1);
+    const displayMax = maxTime * progress * 1.1;
+    const ct1 = Math.min(displayMax, o.myTime);
+    const ct2 = Math.min(displayMax, o.oppTime);
+    t1.textContent = ct1.toFixed(2) + 's';
+    t2.textContent = ct2.toFixed(2) + 's';
+    bar1.style.width = `${(ct1/maxTime)*100}%`;
+    bar2.style.width = `${(ct2/maxTime)*100}%`;
+
+    if (!gapShown && ((ct1 >= o.myTime && ct2 < o.oppTime) || (ct2 >= o.oppTime && ct1 < o.myTime))) {
+      gapEl.textContent = `+${Math.abs(o.oppTime - o.myTime).toFixed(2)}s gap`;
+      gapEl.style.opacity = '1'; gapShown = true;
+    }
+
+    // Flash interval accelerates
+    flashInterval = 400 - progress * 330; // 400ms → 70ms
+    const timeSinceFlash = elapsed - lastFlash;
+
+    // Strobe logic
+    if (timeSinceFlash >= flashInterval) {
+      lastFlash = elapsed;
+      // FLASH — reveal bars
+      overlay.style.opacity = '0';
+      haptic(Math.floor(5 + progress * 15));
+
+      // Show time in the glow
+      const faster = ct1 < ct2 ? ct1 : ct2;
+      glowNum.textContent = faster.toFixed(1) + 's';
+      glowNum.style.opacity = '0';
+
+      // Quick blackout return
+      const flashDur = 60 + progress * 60; // longer flashes as we go
+      setTimeout(() => {
+        if (elapsed < duration - 100) {
+          overlay.style.opacity = '0.92';
+          // Show number in the dark
+          glowNum.style.opacity = '1';
+          glowNum.style.fontSize = `${48 + progress * 36}px`;
+        }
+      }, flashDur);
+    }
+
+    // Shake during flashes
+    if (progress > 0.3) {
+      const intensity = Math.pow(progress, 2) * 10;
+      stage.style.transform = `translate(${(Math.random()-0.5)*intensity}px, ${(Math.random()-0.5)*intensity*0.3}px)`;
+    }
+
+    if (elapsed >= duration) {
+      clearInterval(ticker);
+      // Final flash HOLDS
+      overlay.style.opacity = '0';
+      glowNum.style.opacity = '0';
+
+      if (isWin) { t1.style.color='#22c55e'; bar1.style.background='#22c55e'; }
+      else { t2.style.color='#22c55e'; bar2.style.background='#22c55e'; }
+
+      haptic(50);
+      t(() => {
+        overlay.remove(); glowNum.remove();
+        race.remove(); stage.querySelector('.cr-answers')?.remove();
+        stage.style.transform = '';
+        doExplosion(stage, isWin);
+      }, 500);
+    }
+  }, step);
+  intervals.push(ticker);
+}
+
+// ========== CONCEPT 5: SEISMOGRAPH ==========
+function conceptSeismic(stage, race, o, isWin) {
+  const container = document.createElement('div');
+  container.className = 'seismo-container';
+  const canvas = document.createElement('canvas');
+  canvas.className = 'seismo-canvas';
+  canvas.width = 360; canvas.height = 80;
+  container.appendChild(canvas);
+
+  const scaleText = document.createElement('div');
+  scaleText.className = 'seismo-scale';
+  scaleText.textContent = 'MAG 0.0';
+  container.appendChild(scaleText);
+  stage.appendChild(container);
+
+  const ctx = canvas.getContext('2d');
+
+  // Crack overlay
+  const cracks = document.createElement('div');
+  cracks.style.cssText = 'position:absolute;inset:0;border-radius:20px;pointer-events:none;z-index:6;opacity:0;transition:opacity 0.3s;';
+  stage.appendChild(cracks);
+
+  const t1 = race.querySelector('.cr-time-you');
+  const t2 = race.querySelector('.cr-time-opp');
+  const bar1 = race.querySelector('.cr-bar-you');
+  const bar2 = race.querySelector('.cr-bar-opp');
+  const gapEl = race.querySelector('.cr-gap');
+  const maxTime = Math.max(o.myTime, o.oppTime);
+  const duration = 2000;
+  const step = 20;
+  let elapsed = 0;
+  let gapShown = false;
+  const seismoData = [];
+
+  const ticker = setInterval(() => {
+    elapsed += step;
+    const progress = Math.min(elapsed / duration, 1);
+    const displayMax = maxTime * progress * 1.1;
+    const ct1 = Math.min(displayMax, o.myTime);
+    const ct2 = Math.min(displayMax, o.oppTime);
+    t1.textContent = ct1.toFixed(2) + 's';
+    t2.textContent = ct2.toFixed(2) + 's';
+    bar1.style.width = `${(ct1/maxTime)*100}%`;
+    bar2.style.width = `${(ct2/maxTime)*100}%`;
+
+    if (!gapShown && ((ct1 >= o.myTime && ct2 < o.oppTime) || (ct2 >= o.oppTime && ct1 < o.myTime))) {
+      gapEl.textContent = `+${Math.abs(o.oppTime - o.myTime).toFixed(2)}s gap`;
+      gapEl.style.opacity = '1'; gapShown = true;
+    }
+
+    // Seismograph — amplitude increases with progress
+    const baseAmplitude = 2 + Math.pow(progress, 2) * 35;
+    const frequency = 0.3 + progress * 0.5;
+    const noise = (Math.random() - 0.5) * baseAmplitude;
+    const wave = Math.sin(elapsed * frequency * 0.01) * baseAmplitude * 0.3;
+    const spike = Math.random() < (progress * 0.15) ? (Math.random()-0.5) * baseAmplitude * 2 : 0;
+    seismoData.push(40 + noise + wave + spike);
+    if (seismoData.length > 180) seismoData.shift();
+
+    // Draw seismograph
+    ctx.clearRect(0, 0, 360, 80);
+    ctx.strokeStyle = `rgba(124,92,252,${0.4 + progress * 0.5})`;
+    ctx.lineWidth = progress > 0.7 ? 3 : 2;
+    ctx.beginPath();
+    seismoData.forEach((y, i) => {
+      const x = (i / 180) * 360;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+
+    // Red zone highlight when violent
+    if (progress > 0.6) {
+      ctx.fillStyle = `rgba(239,68,68,${(progress-0.6)*0.15})`;
+      ctx.fillRect(0, 0, 360, 80);
+    }
+
+    // Magnitude
+    const mag = Math.min(progress * 12, 10).toFixed(1);
+    scaleText.textContent = `MAG ${mag}`;
+    scaleText.style.color = progress > 0.7 ? `rgba(239,68,68,${0.5+progress*0.4})` : `rgba(124,92,252,${0.4+progress*0.4})`;
+
+    // Shake — seismic!
+    const intensity = 2 + Math.pow(progress, 1.5) * 14;
+    const dx = (Math.random()-0.5) * intensity;
+    const dy = (Math.random()-0.5) * intensity * 0.5;
+    const rot = (Math.random()-0.5) * intensity * 0.1;
+    stage.style.transform = `translate(${dx}px, ${dy}px) rotate(${rot}deg)`;
+    if (progress > 0.4) haptic(Math.floor(progress * 15));
+
+    // Cracks appear at high magnitude
+    if (progress > 0.6) {
+      cracks.style.opacity = String((progress - 0.6) * 2.5);
+      const crackShadow = `inset ${(Math.random()-0.5)*40}px ${(Math.random()-0.5)*20}px ${10+progress*20}px rgba(0,0,0,${progress*0.15})`;
+      cracks.style.boxShadow = crackShadow;
+    }
+
+    if (elapsed >= duration) {
+      clearInterval(ticker);
+      if (isWin) { t1.style.color='#22c55e'; bar1.style.background='#22c55e'; }
+      else { t2.style.color='#22c55e'; bar2.style.background='#22c55e'; }
+
+      scaleText.textContent = 'MAG 10.0';
+      scaleText.style.color = 'rgba(239,68,68,0.9)';
+      scaleText.style.fontSize = '20px';
+
+      t(() => {
+        container.remove(); cracks.remove();
+        race.remove(); stage.querySelector('.cr-answers')?.remove();
+        stage.style.transform = '';
+        doExplosion(stage, isWin);
+      }, 400);
+    }
+  }, step);
+  intervals.push(ticker);
+}
+
+// ========== SHARED EXPLOSION ==========
+function doExplosion(stage, isWin) {
+  const resultColor = isWin ? '#22c55e' : '#ef4444';
+  const bannerTexts = isWin ? ["LET'S GO","EASY MONEY","TOO FAST","WRECKED","DOMINATED"] : ["GOT COOKED","DESTROYED","OOF","TOUGH LUCK","SMOKED"];
+  const bannerText = bannerTexts[Math.floor(Math.random()*bannerTexts.length)];
+
+  // Flash
+  const flash = document.createElement('div');
+  flash.className = 'cr-flash';
+  flash.style.background = isWin ? 'rgba(34,197,94,0.35)' : 'rgba(239,68,68,0.3)';
+  stage.appendChild(flash);
+  requestAnimationFrame(() => flash.classList.add('cr-flash-go'));
+
+  // Shockwaves
+  const colors = isWin ? ['rgba(34,197,94,0.5)','rgba(124,92,252,0.4)','rgba(245,158,11,0.3)'] : ['rgba(239,68,68,0.5)','rgba(124,92,252,0.3)'];
+  colors.forEach((c, i) => {
+    t(() => {
+      const s = document.createElement('div');
+      s.className = 'cr-shockwave';
+      s.style.borderColor = c;
+      stage.appendChild(s);
+      requestAnimationFrame(() => s.classList.add('cr-sw-go'));
+    }, i * 100);
+  });
+
+  // Confetti
+  const count = isWin ? 60 : 15;
+  const confColors = isWin ? ['#22c55e','#7c5cfc','#f59e0b','#ec4899','#06b6d4','#fff'] : ['#ef4444','#666','#999'];
+  for (let i = 0; i < count; i++) {
+    const p = document.createElement('div');
+    p.className = 'cr-confetti';
+    const size = 4 + Math.random() * 8;
+    p.style.cssText = `width:${size}px;height:${size*0.6}px;background:${confColors[Math.floor(Math.random()*confColors.length)]};left:${40+Math.random()*20}%;top:${30+Math.random()*20}%;--dx:${(Math.random()-0.5)*280}px;--dy:${-(100+Math.random()*220)}px;--rot:${Math.random()*540}deg;border-radius:${Math.random()>0.4?'1px':'50%'};`;
+    stage.appendChild(p);
+    requestAnimationFrame(() => p.classList.add('cr-pop'));
   }
 
-  // Banner slams down from above
-  setTimeout(()=>{
-    const banner=document.createElement('div');
-    banner.className='result-banner';
-    banner.style.cssText=`color:${resultColor};transform:translateY(-60px) scale(1.3);opacity:0;transition:all 0.35s cubic-bezier(0.34,1.56,0.64,1);`;
-    banner.textContent=d.banner;
-    stage.appendChild(banner);
-    requestAnimationFrame(()=>{
-      banner.style.transform='translateY(0) scale(1)';
-      banner.style.opacity='1';
+  haptic(50);
+
+  // Banner + results
+  t(() => {
+    const finalBlock = document.createElement('div');
+    finalBlock.style.cssText = 'position:relative;z-index:10;text-align:center;width:100%;';
+
+    const banner = document.createElement('div');
+    banner.style.cssText = `font-size:28px;font-weight:900;letter-spacing:2px;color:${resultColor};transform:translateY(30px) scale(1.3);opacity:0;transition:all 0.35s cubic-bezier(0.34,1.56,0.64,1);`;
+    banner.textContent = bannerText;
+    finalBlock.appendChild(banner);
+
+    const sub = document.createElement('div');
+    sub.style.cssText = `font-size:22px;font-weight:800;color:#333;margin-top:4px;opacity:0;transform:translateY(10px);transition:all 0.3s ease 0.15s;`;
+    sub.textContent = isWin ? '✅ Correct' : '❌ Wrong';
+    finalBlock.appendChild(sub);
+
+    stage.appendChild(finalBlock);
+
+    requestAnimationFrame(() => {
+      banner.style.transform = 'translateY(0) scale(1)';
+      banner.style.opacity = '1';
+      sub.style.opacity = '1';
+      sub.style.transform = 'translateY(0)';
     });
     haptic(30);
-    showFinalDetails(stage,d,400);
-  },180);
+  }, 180);
 }
+
+// Auto-play on load
+play();
 </script>
 </body>
 </html>
